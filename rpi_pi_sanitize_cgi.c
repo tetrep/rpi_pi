@@ -53,15 +53,19 @@ int rpi_pi_sanitize_cgi(unsigned int flags, unsigned int num_cstrings, ...)
   //iterate over cstring(s)
   for(i=i; i < num_cstrings; i++)
   {
+    printf("i: %u\n", i);
     //grab a string
     cur_cstring = va_arg(args, char*);
     //reset our cstring index
     j = 0;
     while(cur_cstring[j] != '\0')
     {
+      //is it an invalid character?
       if(!((list+cur_cstring[j])[0] & 1))
       {
-        printf("no %c\n", cur_cstring[j]);
+        //sanitize!
+        cur_cstring[j] = ' ';
+        //increment error counter
         error++;
       }
 
@@ -116,8 +120,6 @@ char* rpi_pi_sanitize_cgi_build_list(unsigned int value, char* list)
 
   while(list[i] != '\0')
   {
-    printf("build list i: %u\n", i);
-
     //bit by bit...
     switch(value)
     {

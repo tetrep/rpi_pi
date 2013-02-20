@@ -15,6 +15,10 @@ int main(int argc, char **argv)
   error = sanitize_cgi(RPI_PI_SANITIZE_CGI_WARN | RPI_PI_SANITIZE_CGI_LIST_WHITE | RPI_PI_SANITIZE_CGI_LIST_BLACK, num_cstrings, string1, string2, string3, string4);
 
   printf("THE ERROR: %i\n", error);
+  printf("STRING1: %s\n", string1);
+  printf("STRING2: %s\n", string2);
+  printf("STRING3: %s\n", string3);
+  printf("STRING4: %s\n", string4);
 
   return 0;
 }
