@@ -15,11 +15,16 @@
 
   //@brief sanitizes the given cstrings
   //@param flags any needed predefined flags, or'd together
-  unsigned int rpi_pi_sanitize_cgi(unsigned int /*flags*/, unsigned int /*num_cstrings*/, ...);
+  int rpi_pi_sanitize_cgi(unsigned int /*flags*/, unsigned int /*num_cstrings*/, ...);
+  //@brief builds a bit list of acceptable characters, returned list needs to be freed!!!!!!
+  //@param value the desired value to set the bits, 0 for black list 1 for white list
+  //@param list the list of characters to be given the given value
+  char* rpi_pi_sanitize_cgi_build_list(unsigned int /*value*/, char* /*list*/);
 
-  //short name(s)
+  //short names
   #ifdef RPI_PI_SANITIZE_CGI_SHORT_NAMES
     #define sanitize_cgi(...) rpi_pi_sanitize_cgi(__VA_ARGS__)
+    #define build_list(...) rpi_pi_sanitize_cgi_build_list(__VA_ARGS__)
   #endif
 
 #endif

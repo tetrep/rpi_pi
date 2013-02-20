@@ -2,15 +2,16 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
-unsigned int rpi_pi_sanitize_cgi(unsigned int flags, unsigned int num_cstrings, ...)
+int rpi_pi_sanitize_cgi(unsigned int flags, unsigned int num_cstrings, ...)
 {
   //all our cstrings
-  va_list args = NULL;
+  va_list args;
   //our white/black list
-  char list = 0;
+  char* list = NULL;
   //our current cstring
-  unsigned char *cur_cstring = NULL;
+  char *cur_cstring = NULL;
   //our error(s)
   unsigned int error = 0;
   //because we rely on null :(
@@ -19,42 +20,56 @@ unsigned int rpi_pi_sanitize_cgi(unsigned int flags, unsigned int num_cstrings, 
   unsigned int j = 0;
 
   //it's sad i have to do this
-  if(i == 0)
+  if(i == num_cstrings)
     return error;
 
   //initialize args
   va_start(args, num_cstrings);
 
-  //are we using a white/black list?
-  if(flags & RPI_PI_SANITIZE_CGI_LIST_WHITE || flags & RPI_PI_SANITIZE_CGI_LIST_BLACK)
+  //white list?
+  if(flags & RPI_PI_SANITIZE_CGI_LIST_WHITE)
   {
-    //get first cstring
-    list = va_arg(args, unsigned char*);
-    //increment counter
+    //get first cstring and make a white list from it
+    list = rpi_pi_sanitize_cgi_build_list(1, va_arg(args, char*));
+    //increment cstring counter
+    i++;
+  }
+  //black list?
+  else if(flags & RPI_PI_SANITIZE_CGI_LIST_BLACK)
+  {
+    //get first cstring and make a black list from it
+    list = rpi_pi_sanitize_cgi_build_list(0, va_arg(args, char*));
+    //increment cstring counter
     i++;
   }
   //default to alphanumeric white list
   else
-  {
-    list = rpi_pi_sanitize_cgi_build_list_white(1, "abcdefghijklmnopqrstuvwkyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
-    flags | RPI_PI_SANITIZE_CGI_LIST_WHITE;
-  }
+    list = rpi_pi_sanitize_cgi_build_list(1, "abcdefghijklmnopqrstuvwkyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
   
+  //do we have a list to check against?
+  if(list == NULL)
+    return -1;
+
   //iterate over cstring(s)
-  for(i; i < num_cstrings; i++)
+  for(i=i; i < num_cstrings; i++)
   {
     //grab a string
-    cur_cstring = va_arg(args, unsigned char*);
+    cur_cstring = va_arg(args, char*);
     //reset our cstring index
     j = 0;
     while(cur_cstring[j] != '\0')
     {
-      if(flags & RPI_PI_SANITIZE_CGI_LIST_WHITE)
+      if(!((list+cur_cstring[j])[0] & 1))
       {
+        printf("no %c\n", cur_cstring[j]);
+        error++;
       }
+
+      j++;
     }
   }
 
+  free(list);
   //returns number of invalid characters if wanted
   if(flags & RPI_PI_SANITIZE_CGI_WARN)
     return error;
@@ -62,15 +77,20 @@ unsigned int rpi_pi_sanitize_cgi(unsigned int flags, unsigned int num_cstrings, 
     return 0;
 }
 
-unsigned char* rpi_pi_sanitize_cgi_build_list(int value, char* list)
+char* rpi_pi_sanitize_cgi_build_list(unsigned int value, char* list)
 {
   //our list index
   unsigned int i = 0;
   //the list we will return
-  unsigned char ret_list[33];
+  char* ret_list = NULL;
+
+  //allocate memory for our list
+  ret_list = malloc(17);
+  if(ret_list == NULL)
+    return ret_list;
 
   //initialze our return list
-  for(i = 0; i < 32; i++)
+  for(i = 0; i < 17; i++)
   {
     switch(value)
     {
@@ -93,24 +113,32 @@ unsigned char* rpi_pi_sanitize_cgi_build_list(int value, char* list)
 
   while(list[i] != '\0')
   {
+    printf("build list i: %u\n", i);
+
     //bit by bit...
     switch(value)
     {
       //black list
       case 0:
-        //set the bit to 0 by anding with 11111110
+        //set the bit to 0 by anding with the byte 11111110
         (ret_list+list[i])[0] = (ret_list+list[i])[0] & 254;
         break;
 
       
       case 1:
-        //set the bit to 1 by oring with 00000001
+        //set the bit to 1 by oring with the byte 00000001
         (ret_list+list[i])[0] = (ret_list+list[i])[0] | 1;
         break;
 
       //white list default
       default:
-        (ret_list+list[i])[0]
+        //set the bit to 1 by oring with the byte 00000001
+        (ret_list+list[i])[0] = (ret_list+list[i])[0] | 1;
         break;
+    }
+
+    i++;
   }
+
+  return ret_list;
 }
