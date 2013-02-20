@@ -1,5 +1,3 @@
-//@file rpi pi sanitize cgi header file
-
 //include protection
 #ifndef RPI_PI_SANITIZE_CGI_H
   #define RPI_PI_SANITIZE_CGI_H
