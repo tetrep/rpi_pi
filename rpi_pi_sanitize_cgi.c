@@ -69,7 +69,10 @@ int rpi_pi_sanitize_cgi(unsigned int flags, unsigned int num_cstrings, ...)
     }
   }
 
+  //memory managment!
   free(list);
+  va_end(args);
+
   //returns number of invalid characters if wanted
   if(flags & RPI_PI_SANITIZE_CGI_WARN)
     return error;
