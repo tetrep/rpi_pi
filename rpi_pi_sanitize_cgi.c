@@ -4,7 +4,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
-char** rpi_pi_sanitize_cgi(unsigned int flags, unsigned int num_cstrings, ...)
+int rpi_pi_sanitize_cgi(unsigned int flags, unsigned int num_cstrings, ...)
 {
   //all our cstrings
   va_list args;
@@ -12,8 +12,6 @@ char** rpi_pi_sanitize_cgi(unsigned int flags, unsigned int num_cstrings, ...)
   char* list = NULL;
   //our current cstring
   char *cur_cstring = NULL;
-  //our return list
-  char** ret_list;
   //our error(s)
   unsigned int error = 0;
   //because we rely on null :(
@@ -50,7 +48,10 @@ char** rpi_pi_sanitize_cgi(unsigned int flags, unsigned int num_cstrings, ...)
   
   //do we have a list to check against?
   if(list == NULL)
+  {
+    va_end(args);
     return -1;
+  }
 
   //iterate over cstring(s)
   for(i=i; i < num_cstrings; i++)
@@ -66,7 +67,7 @@ char** rpi_pi_sanitize_cgi(unsigned int flags, unsigned int num_cstrings, ...)
       if(!((list+cur_cstring[j])[0] & 1))
       {
         //sanitize!
-        //cur_cstring[j] = ' ';
+        cur_cstring[j] = ' ';
         //increment error counter
         error++;
       }
