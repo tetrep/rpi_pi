@@ -44,7 +44,7 @@ int rpi_pi_sanitize_cgi(unsigned int flags, unsigned int num_cstrings, ...)
   }
   //default to alphanumeric white list
   else
-    list = rpi_pi_sanitize_cgi_build_list(1, "abcdefghijklmnopqrstuvwkyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+    list = rpi_pi_sanitize_cgi_build_list(1, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
   
   //do we have a list to check against?
   if(list == NULL)
@@ -67,7 +67,7 @@ int rpi_pi_sanitize_cgi(unsigned int flags, unsigned int num_cstrings, ...)
       if(!((list+cur_cstring[j])[0] & 1))
       {
         //sanitize!
-        cur_cstring[j] = ' ';
+        cur_cstring[j] = '\0';
         //increment error counter
         error++;
       }
