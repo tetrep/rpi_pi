@@ -29,12 +29,17 @@ int main(int argc, char **argv)
   printf("STRING2: %s\n", string2);
   printf("STRING3: %s\n", string3);
   printf("STRING4: %s\n", string4);
-  printf("THE ERROR: %i\n", error);
+  printf("THE SANITIZE ERROR: %i\n", error);
   printf("=====\n");
 
   error = lpq("paul", "vcpltg");
 
-  printf("THE ERROR: %i\n", error);
+  printf("THE LPQ ERROR: %i\n", error);
+  printf("=====\n");
+
+  error = lprm("paul", "vcpltg", "cheese");
+
+  printf("THE LPRM ERROR: %i\n", error);
   printf("=====\n");
 
   return 0;
