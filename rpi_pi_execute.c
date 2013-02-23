@@ -16,13 +16,17 @@ int rpi_pi_lpq(char* user, char* printer)
     strcat(cmd, printer);
     strcat(cmd, "'");
 
-    return system(cmd);
+    //return system(cmd);
+    printf("%s\n", cmd);
+    return 0;
 }
 
 int rpi_pi_lpr(char* user, char* printer, void* file)
 {
   //char cmd[strlen("su ") + strlen(user) + strlen(" -c 'lpr 
+
   //return system(cmd);
+  //printf("%s, cmd");
   return 0;
 }
 
@@ -41,5 +45,7 @@ int rpi_pi_lprm(char* user, char* printer, char* job)
   strcat(cmd, job);
   strcat(cmd, "'");
 
-  return system(cmd);
+  //return system(cmd);
+  printf("%s\n", cmd);
+  return 0;
 }

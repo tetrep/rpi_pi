@@ -12,7 +12,6 @@ int main(int argc, char **argv)
   char string2[strlen("tetrep")+1];
   char string3[strlen("123456")+1];
   char string4[strlen("tetrep'123456'!")+1];
-  unsigned int num_cstrings = 4;
   int error = 0;
 
   strcpy(string1, "abcdefghijklmnopqrstuvwxyz");
@@ -23,7 +22,7 @@ int main(int argc, char **argv)
 
   strcpy(string4, "tetrep'123456'!");
 
-  error = sanitize_cgi(RPI_PI_SANITIZE_CGI_WARN, num_cstrings, string1, string2, string3, string4);
+  error = sanitize_cgi(RPI_PI_SANITIZE_CGI_WARN, string1, string2, string3, string4, NULL);
 
   printf("STRING1: %s\n", string1);
   printf("STRING2: %s\n", string2);
