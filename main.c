@@ -14,6 +14,11 @@ int main(int argc, char **argv)
   char string4[strlen("tetrep'123456'!")+1];
   int error = 0;
 
+  if(argc)
+  {}
+  else if(argv)
+  {}
+
   strcpy(string1, "abcdefghijklmnopqrstuvwxyz");
 
   strcpy(string2, "tetrep");
@@ -23,7 +28,6 @@ int main(int argc, char **argv)
   strcpy(string4, "tetrep'123456'!");
 
   error = sanitize_cgi(RPI_PI_SANITIZE_CGI_WARN, string1, string2, string3, string4, NULL);
-
   printf("STRING1: %s\n", string1);
   printf("STRING2: %s\n", string2);
   printf("STRING3: %s\n", string3);
@@ -31,14 +35,20 @@ int main(int argc, char **argv)
   printf("THE SANITIZE ERROR: %i\n", error);
   printf("=====\n");
 
-  error = lpq("paul", "vcpltg");
-
+  error = (int) lpq("paul", "vcpltg");
   printf("THE LPQ ERROR: %i\n", error);
   printf("=====\n");
 
-  error = lprm("paul", "vcpltg", "cheese");
-
+  error = (int) lprm("paul", "vcpltg", "cheese");
   printf("THE LPRM ERROR: %i\n", error);
+  printf("=====\n");
+
+  error = forker(rpi_pi_execute_lpq, "paul", "vcpltg", NULL);
+  printf("THE FORKER LPQ ERROR: %i\n", error);
+  printf("=====\n");
+
+  error = forker(rpi_pi_execute_lprm, "paul", "vcpltg", "cheese", NULL);
+  printf("THE FORKER LPRM ERROR: %i\n", error);
   printf("=====\n");
 
   return 0;
