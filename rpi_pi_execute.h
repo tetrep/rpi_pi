@@ -18,7 +18,9 @@
   //@param job the job we want to cancel
   void* rpi_pi_execute_lprm(char* /*user*/, char* /*printer*/, char* /*job*/);
 
-  //@brief forks the given function, redirecting its stdout to our stdin via fifo
+  //@brief forks the given function, piping its stdout to the parent
+  //@param fp the function to be executed
+  //@param ... the arguments for the function, the last one being NULL and all being pointers
   int rpi_pi_execute_forker(void* (*fp)(), ...);
 
   //short function names
