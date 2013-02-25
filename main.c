@@ -35,6 +35,7 @@ int main(int argc, char **argv)
   printf("THE SANITIZE ERROR: %i\n", error);
   printf("=====\n");
 
+  /*
   error = (int) lpq("paul", "vcpltg");
   printf("THE LPQ ERROR: %i\n", error);
   printf("=====\n");
@@ -42,6 +43,7 @@ int main(int argc, char **argv)
   error = (int) lprm("paul", "vcpltg", "cheese");
   printf("THE LPRM ERROR: %i\n", error);
   printf("=====\n");
+  */
 
   error = forker(rpi_pi_execute_lpq, "paul", "vcpltg", NULL);
   printf("THE FORKER LPQ ERROR: %i\n", error);
@@ -49,6 +51,10 @@ int main(int argc, char **argv)
 
   error = forker(rpi_pi_execute_lprm, "paul", "vcpltg", "cheese", NULL);
   printf("THE FORKER LPRM ERROR: %i\n", error);
+  printf("=====\n");
+
+  error = forker(rpi_pi_execute_lpr, "paul", "vcpltg", "cheese", NULL);
+  printf("THE FORKER LPR ERROR: %i\n", error);
   printf("=====\n");
 
   return 0;
