@@ -2,6 +2,7 @@
 #include "rpi_pi_sanitize_cgi.h"
 #define RPI_PI_EXECUTE_SHORT_NAMES
 #include "rpi_pi_execute.h"
+#include "rpi_pi_parse_lpq.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -49,6 +50,10 @@ int main(int argc, char **argv)
 
   error = forker(rpi_pi_execute_lprm, "paul", "vcpltg", "cheese", NULL);
   printf("THE FORKER LPRM ERROR: %i\n", error);
+  printf("=====\n");
+
+  error = (int) rpi_pi_parse_lpq_job_tok("paul", "vcpltg", NULL);
+  printf("THE LPQ_JOB_TOK ERROR: %i\n", error);
   printf("=====\n");
 
   return 0;

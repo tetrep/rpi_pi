@@ -26,9 +26,6 @@ int rpi_pi_execute_forker(void* (*fp)(), ...)
   //the arguments we pull out
   void *args[RPI_PI_EXECUTE_FORKER_ARGS_MAX];
 
-  //'cus we can't go declaring this all willy nilly
-  char sexy_input;
-
   //pipe it!
   if(pipe(pipefd) == -1)
     return -1;
@@ -126,11 +123,14 @@ int rpi_pi_execute_forker(void* (*fp)(), ...)
       //we don't want to write
       close(pipefd[1]);
 
-      //read from child
-      while(read(pipefd[0], &sexy_input, 1) > 0)
-        printf("%c", sexy_input);
+      fclose(stdin);
+      stdin = fdopen(pipefd[0], "r");
 
-      close(pipefd[0]);
+      //dont read from child, we want to let our caller read
+      /*
+      while(fread(&sexy_input, 1, 1, stdin) > 0)
+        printf("%c", sexy_input);
+      */
 
       //wait for child
       wait(NULL);
