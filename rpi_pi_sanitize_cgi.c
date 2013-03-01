@@ -9,7 +9,7 @@ int rpi_pi_sanitize_cgi(unsigned int flags, ...)
   //all our cstrings
   va_list args;
   //our white/black list
-  char* list = NULL;
+  char *list = NULL;
   //our current cstring
   char *cur_cstring = NULL;
   //our error(s)
@@ -80,12 +80,12 @@ int rpi_pi_sanitize_cgi(unsigned int flags, ...)
     return 0;
 }
 
-char* rpi_pi_sanitize_cgi_build_list(unsigned int value, char* list)
+char *rpi_pi_sanitize_cgi_build_list(unsigned int value, char *list)
 {
   //our list index
   unsigned int i = 0;
   //the list we will return
-  char* ret_list = NULL;
+  char *ret_list = NULL;
 
   //do we have anything to do?
   if(list == NULL)

@@ -28,6 +28,7 @@ int main(int argc, char **argv)
 
   strcpy(string4, "tetrep'123456'!");
 
+  /*
   error = sanitize_cgi(RPI_PI_SANITIZE_CGI_WARN, string1, string2, string3, string4, NULL);
   printf("STRING1: %s\n", string1);
   printf("STRING2: %s\n", string2);
@@ -43,6 +44,7 @@ int main(int argc, char **argv)
   error = (int) lprm("paul", "vcpltg", "cheese");
   printf("THE LPRM ERROR: %i\n", error);
   printf("=====\n");
+  */
 
   error = forker(rpi_pi_execute_lpq, "paul", "vcpltg", NULL);
   printf("THE FORKER LPQ ERROR: %i\n", error);

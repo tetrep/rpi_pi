@@ -13,7 +13,7 @@
 #define RPI_PI_EXECUTE_FORKER_ARGS_MAX 11
 
 //forks on the given function and redirects its stdout to us
-int rpi_pi_execute_forker(void* (*fp)(), ...)
+int rpi_pi_execute_forker(void *(*fp)(), ...)
 {
   //our pipe
   int pipefd[2];
@@ -139,7 +139,7 @@ int rpi_pi_execute_forker(void* (*fp)(), ...)
   return 0;
 }
 
-void* rpi_pi_execute_lpq(char* user, char* printer)
+void *rpi_pi_execute_lpq(char *user, char *printer)
 {
   //plus 2 because we need to end the command with ' and \0
   char cmd[strlen("su ") + strlen(user) + strlen(" -c 'lpq -lP") + strlen(printer) + 2];
@@ -156,7 +156,7 @@ void* rpi_pi_execute_lpq(char* user, char* printer)
   return 0;
 }
 
-void* rpi_pi_execute_lpr(char* user, char* printer, void* file)
+void *rpi_pi_execute_lpr(char *user, char *printer, void *file)
 {
   //char cmd[strlen("su ") + strlen(user) + strlen(" -c 'lpr 
 
@@ -168,7 +168,7 @@ void* rpi_pi_execute_lpr(char* user, char* printer, void* file)
     return 0;
 }
 
-void* rpi_pi_execute_lprm(char* user, char* printer, char* job)
+void *rpi_pi_execute_lprm(char *user, char *printer, char *job)
 {
   //plus 2 because we need to close the ' and add a \0
   char cmd[strlen("su ") + strlen(user) + strlen(" -c 'lprm -P ") + strlen(printer) + strlen(job) + 2];
