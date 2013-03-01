@@ -13,8 +13,10 @@
 #define RPI_PI_EXECUTE_FORKER_ARGS_MAX 11
 
 //forks on the given function and redirects its stdout to us
+//@TODO finally verified my suspicions, this only works on sheer stack frame luck, need to fix
 int rpi_pi_execute_forker(void *(*fp)(), ...)
 {
+  /*
   //our pipe
   int pipefd[2];
 
@@ -130,12 +132,12 @@ int rpi_pi_execute_forker(void *(*fp)(), ...)
       /*
       while(fread(&sexy_input, 1, 1, stdin) > 0)
         printf("%c", sexy_input);
-      */
+      /
 
       //wait for child
       wait(NULL);
   }
-
+  */
   return 0;
 }
 
