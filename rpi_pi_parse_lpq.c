@@ -16,7 +16,7 @@ char** rpi_pi_parse_lpq_job_tok(char *user, char *printer)
   int index = 0, ret_max = 10;
 
   //lets start with 10
-  ret = calloc(10, sizeof(char*));
+  ret = alloc(10, sizeof(char*));
 
   //we only want 10 bytes :(
   if(ret == NULL)
@@ -46,30 +46,34 @@ char** rpi_pi_parse_lpq_job_tok(char *user, char *printer)
         //did we find a job id?
         if(job != NULL)
         {
-          //allocate memory for the job id
-          ret[index] = calloc(strlen(job), sizeof(char));
-
-          //copy the job id into the return array
-          strcpy(ret[index], job);
-
-          //increment index
-          index++;
-
           //do we need to allocate more memory?
           if(index >= ret_max)
           {
             //double it! i miss std::vector :(
             ret_max += ret_max;
-            ret = realloc(ret, (ret_max)*sizeof(char));
 
-            if(ret == NULL)
+            if(realloc(ret, (ret_max)*sizeof(char)) == NULL)
               goto rpi_pi_parse_lpq_job_tok_mem_error;
           }
+
+          //allocate memory for the job id
+          ret[index] = calloc(strlen(job), sizeof(char));
+
+          //make it a cstring
+          ret[index][0] = '\0';
+          
+          //copy the job id into the return array
+          strcpy(ret[index], job);
+
+          //so biblical...
+          free(job);
+
+          //increment index
+          index++;
 
           //download more ram please
           if(ret[index] == NULL)
             goto rpi_pi_parse_lpq_job_tok_unspool;
-
         }
       }
     }
@@ -79,12 +83,13 @@ char** rpi_pi_parse_lpq_job_tok(char *user, char *printer)
     //free our wonderful return array
     if(ret != NULL)
     {
-      while(index != 0)
+      //free the "inner" array
+      while(index > -1)
       {
         free(ret[index]);
         index--;
       }
-      free(ret[index]);
+      //free the OG pointer
       free(ret);
     }
 
