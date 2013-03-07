@@ -17,9 +17,9 @@
 
 //forks on the given function and redirects its stdout to us
 //@TODO finally verified my suspicions, this only works on sheer stack frame luck, need to fix
-int rpi_pi_execute_forker(void *(*fp)(), ...)
+int rpi_pi_execute_forker(void *(*fp)(va_list*), ...)
 {
-  /*
+  
   //our pipe
   int pipefd[2];
 
@@ -27,9 +27,7 @@ int rpi_pi_execute_forker(void *(*fp)(), ...)
   pid_t child_pid = -1;
 
   //our argument list
-  va_list arg_list;
-  //the arguments we pull out
-  void *args[RPI_PI_EXECUTE_FORKER_ARGS_MAX];
+  va_list args;
 
   //pipe it!
   if(pipe(pipefd) == -1)
@@ -54,68 +52,9 @@ int rpi_pi_execute_forker(void *(*fp)(), ...)
       fclose(stdout);
       stdout = fdopen(pipefd[1], "w");
 
-      va_start(arg_list, fp);
-      for(child_pid = 0; child_pid < RPI_PI_EXECUTE_FORKER_ARGS_MAX; child_pid++)
-      {
-        //grab an argument
-        args[child_pid] = va_arg(arg_list, void*);
-        if(args[child_pid] == NULL)
-          break;
-      }
-      //we'er done with our arguments
-      va_end(arg_list);
-
-      //nasty nasty switch
-      switch(child_pid)
-      {
-        case 0:
-          fp();
-          break;
-
-        case 1:
-          fp(args[0]);
-          break;
-
-        case 2:
-          fp(args[0], args[1]);
-          break;
-
-        case 3:
-          fp(args[0], args[1], args[2]);
-          break;
-
-        case 4:
-          fp(args[0], args[1], args[2], args[3]);
-          break;
-
-        case 5:
-          fp(args[0], args[1], args[2], args[3], args[4]);
-          break;
-
-        case 6:
-          fp(args[0], args[1], args[2], args[3], args[4], args[5]);
-          break;
-
-        case 7:
-          fp(args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
-          break;
-
-        case 8:
-          fp(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]);
-          break;
-
-        case 9:
-          fp(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
-          break;
-
-        case 10:
-          fp(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
-          break;
-
-        default:
-          fclose(stdout);
-          close(pipefd[1]);
-          exit(0);
+      fclose(stdout);
+      close(pipefd[1]);
+      exit(0);
       }
 
       fclose(stdout);
