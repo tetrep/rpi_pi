@@ -12,15 +12,11 @@ char** rpi_pi_parse_lpq_job_tok(char *user, char *printer)
   char line[100] = {'\0'};
   char *lpq_user = NULL, *job = NULL;
   //our return array
-  char **ret;
+  char **ret = NULL;
+  //current index in return array and max size of return array
   int index = 0, ret_max = 10;
 
-  //lets start with 10
-  ret = alloc(10, sizeof(char*));
 
-  //we only want 10 bytes :(
-  if(ret == NULL)
-    goto rpi_pi_parse_lpq_job_tok_mem_error;
 
   //have lpq output into stdin
   rpi_pi_execute_forker(rpi_pi_execute_lpq, user, printer, NULL);
@@ -28,6 +24,14 @@ char** rpi_pi_parse_lpq_job_tok(char *user, char *printer)
   //grab a line of input
   while(fgets(line, 100, stdin) != NULL)
   {
+    //only run on first input read from stdin
+    if(ret == NULL)
+    {
+      ret = malloc(ret_max*sizeof(char*));
+      if(ret == NULL)
+        goto rpi_pi_parse_lpq_job_tok_mem_error;
+    }
+
     //we want the line with the persons userid
     lpq_user = strstr(line, user);
 
@@ -35,7 +39,7 @@ char** rpi_pi_parse_lpq_job_tok(char *user, char *printer)
     if(lpq_user != NULL)
     {
       //advance to "job"
-      job = strstr(line, "job");
+      job = strstr(lpq_user, "job");
 
       //did we find the string "job"?
       if(job != NULL)
@@ -52,12 +56,20 @@ char** rpi_pi_parse_lpq_job_tok(char *user, char *printer)
             //double it! i miss std::vector :(
             ret_max += ret_max;
 
-            if(realloc(ret, (ret_max)*sizeof(char)) == NULL)
-              goto rpi_pi_parse_lpq_job_tok_mem_error;
+            if(realloc(ret, ret_max*sizeof(char*)) == NULL)
+              goto rpi_pi_parse_lpq_job_tok_unspool;
           }
 
           //allocate memory for the job id
-          ret[index] = calloc(strlen(job), sizeof(char));
+          ret[index] = malloc(strlen(job)*sizeof(char));
+
+          //download more ram please
+          if(ret[index] == NULL)
+          {
+            //we dont need to free the current index
+            index--;
+            goto rpi_pi_parse_lpq_job_tok_unspool;
+          }
 
           //make it a cstring
           ret[index][0] = '\0';
@@ -70,14 +82,29 @@ char** rpi_pi_parse_lpq_job_tok(char *user, char *printer)
 
           //increment index
           index++;
-
-          //download more ram please
-          if(ret[index] == NULL)
-            goto rpi_pi_parse_lpq_job_tok_unspool;
         }
       }
     }
   }
+
+  //null terminate ret array if it exists
+  if(ret != NULL)
+  {
+    //do we have enough room?
+    if(index >= ret_max)
+    {
+      //grab one more slot
+      ret_max++;
+      if(realloc(ret, ret_max*sizeof(char*)) == NULL)
+        goto rpi_pi_parse_lpq_job_tok_unspool;
+    }
+
+    //null terminate array
+    ret[index] = NULL;
+  }
+
+  //no memory errors, woo!
+  return ret;
 
   rpi_pi_parse_lpq_job_tok_unspool:
     //free our wonderful return array
@@ -94,4 +121,6 @@ char** rpi_pi_parse_lpq_job_tok(char *user, char *printer)
     }
 
   rpi_pi_parse_lpq_job_tok_mem_error:
+    perror("PARSE LPQ ERROR: OUT OF MEMORY\n");
+    return NULL;
 }

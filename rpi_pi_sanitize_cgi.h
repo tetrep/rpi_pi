@@ -19,7 +19,7 @@
   //@brief builds a bit list of acceptable characters, returned list needs to be freed!!!!!!
   //@param value the desired value to set the bits, 0 for black list 1 for white list
   //@param list the cstring of characters to be given the aforementioned value
-  char* rpi_pi_sanitize_cgi_build_list(unsigned int /*value*/, char* /*list*/);
+  char *rpi_pi_sanitize_cgi_build_list(unsigned int /*value*/, char */*list*/);
 
   //short names
   #ifdef RPI_PI_SANITIZE_CGI_SHORT_NAMES

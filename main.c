@@ -15,6 +15,8 @@ int main(int argc, char **argv)
   char string4[strlen("tetrep'123456'!")+1];
   int error = 0;
 
+  char **test_parse;
+
   if(argc)
   {}
   else if(argv)
@@ -46,16 +48,29 @@ int main(int argc, char **argv)
   printf("=====\n");
   */
 
+  //check forck function and execute lpq
   error = forker(rpi_pi_execute_lpq, "paul", "vcpltg", NULL);
   printf("THE FORKER LPQ ERROR: %i\n", error);
   printf("=====\n");
 
+  //check fork function and execute lprm
   error = forker(rpi_pi_execute_lprm, "paul", "vcpltg", "cheese", NULL);
   printf("THE FORKER LPRM ERROR: %i\n", error);
   printf("=====\n");
 
-  error = (int) rpi_pi_parse_lpq_job_tok("paul", "vcpltg", NULL);
-  printf("THE LPQ_JOB_TOK ERROR: %i\n", error);
+  //attempt to parse lpq from stdin
+  test_parse = rpi_pi_parse_lpq_job_tok("paul", "vcpltg");
+  //did we get something back?
+  if(test_parse != NULL)
+  {
+    //print out what we got
+    while(test_parse[error] != NULL)
+      printf("%s\n", test_parse[error]);
+  }
+  //we ran out of memory :(
+  else
+    printf("PARSE_LPQ FAIL :(\n");
+
   printf("=====\n");
 
   return 0;
