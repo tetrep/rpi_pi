@@ -16,8 +16,6 @@ char** rpi_pi_parse_lpq_job_tok(char *user, char *printer)
   //current index in return array and max size of return array
   int index = 0, ret_max = 10;
 
-
-
   //have lpq output into stdin
   rpi_pi_execute_forker(rpi_pi_execute_lpq, user, printer, NULL);
 
@@ -45,7 +43,7 @@ char** rpi_pi_parse_lpq_job_tok(char *user, char *printer)
       if(job != NULL)
       {
         //grab the job ID
-        job = strtok(&job[3], "]");
+        job = strtok(&job[3], " ]");
 
         //did we find a job id?
         if(job != NULL)
@@ -61,7 +59,7 @@ char** rpi_pi_parse_lpq_job_tok(char *user, char *printer)
           }
 
           //allocate memory for the job id
-          ret[index] = malloc(strlen(job)*sizeof(char));
+          ret[index] = malloc(strlen(job)*sizeof(char)+1);
 
           //download more ram please
           if(ret[index] == NULL)
@@ -76,9 +74,6 @@ char** rpi_pi_parse_lpq_job_tok(char *user, char *printer)
           
           //copy the job id into the return array
           strcpy(ret[index], job);
-
-          //so biblical...
-          free(job);
 
           //increment index
           index++;

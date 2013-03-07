@@ -59,13 +59,17 @@ int main(int argc, char **argv)
   printf("=====\n");
 
   //attempt to parse lpq from stdin
-  test_parse = rpi_pi_parse_lpq_job_tok("paul", "vcpltg");
+  test_parse = rpi_pi_parse_lpq_job_tok("majumr", "vcplt");
   //did we get something back?
   if(test_parse != NULL)
   {
+    error = 0;
     //print out what we got
     while(test_parse[error] != NULL)
+    {
       printf("%s\n", test_parse[error]);
+      error++;
+    }
   }
   //we ran out of memory :(
   else
