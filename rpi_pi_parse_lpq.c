@@ -17,7 +17,7 @@ char** rpi_pi_parse_lpq_job_tok(char *user, char *printer)
   int index = 0, ret_max = 10;
 
   //have lpq output into stdin
-  rpi_pi_execute_forker(rpi_pi_execute_lpq, user, printer, NULL);
+  //rpi_pi_execute_forker(rpi_pi_execute_lpq, user, printer, NULL);
 
   //grab a line of input
   while(fgets(line, 100, stdin) != NULL)

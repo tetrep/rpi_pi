@@ -1,27 +1,32 @@
 //include protection
 #ifndef RPI_PI_EXECUTE_H
   #define RPI_PI_EXECUTE_h
+  #include <stdarg.h>
   
   //@brief lists the queue for a given printer
-  //@param user the user that will run this command
-  //@param printer the printer we wish to view the queue of
-  void *rpi_pi_execute_lpq(char */*user*/, char */*printer*/);
+  //@param args the va_list containig a user name and a printer
+  //the user that will run this command
+  //the printer we wish to view the queue of
+  void *rpi_pi_execute_lpq(va_list *args);
 
   //@brief prints a given file to a given printer
-  //@param user the user that will run this command
-  //@param printer the printer we wish to send the file to
-  //@param file the file we wish to print
-  void *rpi_pi_execute_lpr(char */*user*/, char */*printer*/, void */*file*/);
+  //@param args the va_list containing a user name, a printer, and a file
+  //the user that will run this command
+  //the printer we wish to send the file to
+  //the file we wish to print
+  void *rpi_pi_execute_lpr(va_list *args);
 
   //@brief cancels a given job from a given printer
-  //@param printer the printer that has the job we want to cancel
-  //@param job the job we want to cancel
-  void *rpi_pi_execute_lprm(char */*user*/, char */*printer*/, char */*job*/);
+  //@param args the va_list containing a user name, a printer, and a job id
+  //the user that will run this command
+  //the printer that has the job we want to cancel
+  //the job we want to cancel
+  void *rpi_pi_execute_lprm(va_list *args);
 
   //@brief forks the given function, piping its stdout to the parent
-  //@param fp the function to be executed
+  //@param fp the function to be executed, must take a pointer to a va_list
   //@param ... the arguments for the function, the last one being NULL and all being pointers
-  int rpi_pi_execute_forker(void *(*fp)(), ...);
+  int rpi_pi_execute_forker(void *(*fp)(va_list*), ...);
 
   //short function names
   #ifdef RPI_PI_EXECUTE_SHORT_NAMES

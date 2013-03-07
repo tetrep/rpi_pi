@@ -11,12 +11,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-//last one needs to be null
-//only 10 supported
-#define RPI_PI_EXECUTE_FORKER_ARGS_MAX 11
-
 //forks on the given function and redirects its stdout to us
-//@TODO finally verified my suspicions, this only works on sheer stack frame luck, need to fix
 int rpi_pi_execute_forker(void *(*fp)(va_list*), ...)
 {
   
@@ -48,18 +43,29 @@ int rpi_pi_execute_forker(void *(*fp)(va_list*), ...)
     case 0:
       //close read end, we want to write
       close(pipefd[0]);
+
       //redirect stdout
       fclose(stdout);
+
       stdout = fdopen(pipefd[1], "w");
 
-      fclose(stdout);
-      close(pipefd[1]);
-      exit(0);
-      }
+      if(stdout == NULL)
+        exit(-1);
 
+      //set up va_list
+      va_start(args, fp);
+
+      //call the function
+      fp(&args);
+
+      //flush and close our end of the pipe
       fclose(stdout);
-      close(pipefd[1]);
+
+      va_end(args);
+
+      //we don't want the child to do anything else
       exit(0);
+
       break;
 
     //we made a baby
@@ -67,21 +73,28 @@ int rpi_pi_execute_forker(void *(*fp)(va_list*), ...)
       //we don't want to write
       close(pipefd[1]);
 
+      //redirect pipe to stdin
       fclose(stdin);
       stdin = fdopen(pipefd[0], "r");
 
       //wait for child
       wait(NULL);
 
+      //close our end of the pipe
       close(pipefd[0]);
   }
-  */
+
   return 0;
 }
 
 //@TODO optimize string generation
-void* rpi_pi_execute_lpq(char* user, char* printer)
+void *rpi_pi_execute_lpq(va_list *args)
 {
+  //get user name
+  char *user = va_arg(*args, char*);
+  //get printer name
+  char *printer = va_arg(*args, char*);
+
   //plus 2 because we needt to close the ' and null terminate
   char cmd[strlen("su ") + strlen(user) + strlen(" -c 'lpq -lP") + strlen(printer) + 2];
   //build our command
@@ -98,9 +111,18 @@ void* rpi_pi_execute_lpq(char* user, char* printer)
 }
 
 //@TODO optimize string generation
-void* rpi_pi_execute_lpr(char* user, char* printer, void* file)
+void* rpi_pi_execute_lpr(va_list *args)
 {
-  char* filename = "test.postyscripts";
+  //get user name
+  char *user = va_arg(*args, char*);
+  //get printer name
+  char *printer = va_arg(*args, char*);
+  //get file name
+  char *file = va_arg(*args, char*);
+
+  //temp file name
+  char *filename = "test.postyscripts";
+
   //plus 2 because we needt to close the ' and null terminate
   char cmd[strlen("su ") + strlen(user) + strlen(" -c 'lpr -P ") + strlen(printer) + strlen(filename) + 2];
   int fd, x;
@@ -135,8 +157,15 @@ void* rpi_pi_execute_lpr(char* user, char* printer, void* file)
 }
 
 //@TODO optimize string generation
-void* rpi_pi_execute_lprm(char* user, char* printer, char* job)
+void *rpi_pi_execute_lprm(va_list *args)
 {
+  //get user name
+  char *user = va_arg(*args, char*);
+  //get printer name
+  char *printer = va_arg(*args, char*);
+  //get job id
+  char *job = va_arg(*args, char*);
+
   //plus 2 because we needt to close the ' and null terminate
   char cmd[strlen("su ") + strlen(user) + strlen(" -c 'lprm -P ") + strlen(printer) + strlen(job) + 2];
 
