@@ -140,12 +140,8 @@ int rpi_pi_execute_forker(void *(*fp)(), ...)
   return 0;
 }
 
-<<<<<<< HEAD
-void *rpi_pi_execute_lpq(char *user, char *printer)
-=======
 //@TODO optimize string generation
 void* rpi_pi_execute_lpq(char* user, char* printer)
->>>>>>> b2360ad3add415ca2248e65fdf9ac018404cef27
 {
   //plus 2 because we needt to close the ' and null terminate
   char cmd[strlen("su ") + strlen(user) + strlen(" -c 'lpq -lP") + strlen(printer) + 2];
@@ -162,12 +158,8 @@ void* rpi_pi_execute_lpq(char* user, char* printer)
   return NULL;
 }
 
-<<<<<<< HEAD
-void *rpi_pi_execute_lpr(char *user, char *printer, void *file)
-=======
 //@TODO optimize string generation
 void* rpi_pi_execute_lpr(char* user, char* printer, void* file)
->>>>>>> b2360ad3add415ca2248e65fdf9ac018404cef27
 {
   char* filename = "test.postyscripts";
   //plus 2 because we needt to close the ' and null terminate
@@ -203,12 +195,8 @@ void* rpi_pi_execute_lpr(char* user, char* printer, void* file)
   return NULL;
 }
 
-<<<<<<< HEAD
-void *rpi_pi_execute_lprm(char *user, char *printer, char *job)
-=======
 //@TODO optimize string generation
 void* rpi_pi_execute_lprm(char* user, char* printer, char* job)
->>>>>>> b2360ad3add415ca2248e65fdf9ac018404cef27
 {
   //plus 2 because we needt to close the ' and null terminate
   char cmd[strlen("su ") + strlen(user) + strlen(" -c 'lprm -P ") + strlen(printer) + strlen(job) + 2];
