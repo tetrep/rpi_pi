@@ -7,6 +7,9 @@
 #include <stdarg.h>
 
 #include <sys/wait.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 //last one needs to be null
 //only 10 supported
@@ -128,22 +131,23 @@ int rpi_pi_execute_forker(void *(*fp)(), ...)
       fclose(stdin);
       stdin = fdopen(pipefd[0], "r");
 
-      //dont read from child, we want to let our caller read
-      /*
-      while(fread(&sexy_input, 1, 1, stdin) > 0)
-        printf("%c", sexy_input);
-      /
-
       //wait for child
       wait(NULL);
+
+      close(pipefd[0]);
   }
   */
   return 0;
 }
 
+<<<<<<< HEAD
 void *rpi_pi_execute_lpq(char *user, char *printer)
+=======
+//@TODO optimize string generation
+void* rpi_pi_execute_lpq(char* user, char* printer)
+>>>>>>> b2360ad3add415ca2248e65fdf9ac018404cef27
 {
-  //plus 2 because we need to end the command with ' and \0
+  //plus 2 because we needt to close the ' and null terminate
   char cmd[strlen("su ") + strlen(user) + strlen(" -c 'lpq -lP") + strlen(printer) + 2];
   //build our command
   cmd[0] = '\0';
@@ -153,26 +157,60 @@ void *rpi_pi_execute_lpq(char *user, char *printer)
   strcat(cmd, printer);
   strcat(cmd, "'");
 
-  //return system(cmd);
-  printf("%s\n", cmd);
-  return 0;
+  system(cmd);
+
+  return NULL;
 }
 
+<<<<<<< HEAD
 void *rpi_pi_execute_lpr(char *user, char *printer, void *file)
+=======
+//@TODO optimize string generation
+void* rpi_pi_execute_lpr(char* user, char* printer, void* file)
+>>>>>>> b2360ad3add415ca2248e65fdf9ac018404cef27
 {
-  //char cmd[strlen("su ") + strlen(user) + strlen(" -c 'lpr 
+  char* filename = "test.postyscripts";
+  //plus 2 because we needt to close the ' and null terminate
+  char cmd[strlen("su ") + strlen(user) + strlen(" -c 'lpr -P ") + strlen(printer) + strlen(filename) + 2];
+  int fd, x;
 
-  //return system(cmd);
-  //printf("%s, cmd");
-  if(user || printer || file)
-    return 0;
-  else
-    return 0;
+  //save postscript file for later printing/troubleshooting
+  fd = creat(filename, 0660);
+  if(fd != -1)
+  {
+    x = 0;
+    while(((char *) file)[x] != '\0')
+    {
+      write(fd, &((char *) file)[x], 1);
+      x++;
+    }
+  }
+
+  //we're done with the file
+  close(fd);
+
+  //build our command
+  cmd[0] = '\0';
+  strcat(cmd, "su ");
+  strcat(cmd, user);
+  strcat(cmd, " -c 'lpr -P ");
+  strcat(cmd, printer);
+  strcat(cmd, filename);
+  strcat(cmd, "'");
+
+  system(cmd);
+
+  return NULL;
 }
 
+<<<<<<< HEAD
 void *rpi_pi_execute_lprm(char *user, char *printer, char *job)
+=======
+//@TODO optimize string generation
+void* rpi_pi_execute_lprm(char* user, char* printer, char* job)
+>>>>>>> b2360ad3add415ca2248e65fdf9ac018404cef27
 {
-  //plus 2 because we need to close the ' and add a \0
+  //plus 2 because we needt to close the ' and null terminate
   char cmd[strlen("su ") + strlen(user) + strlen(" -c 'lprm -P ") + strlen(printer) + strlen(job) + 2];
 
   //build our command
@@ -185,7 +223,7 @@ void *rpi_pi_execute_lprm(char *user, char *printer, char *job)
   strcat(cmd, job);
   strcat(cmd, "'");
 
-  //return system(cmd);
-  printf("%s\n", cmd);
-  return 0;
+  system(cmd);
+
+  return NULL;
 }

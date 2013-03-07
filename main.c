@@ -39,6 +39,7 @@ int main(int argc, char **argv)
   printf("THE SANITIZE ERROR: %i\n", error);
   printf("=====\n");
 
+  /*
   error = (int) lpq("paul", "vcpltg");
   printf("THE LPQ ERROR: %i\n", error);
   printf("=====\n");
