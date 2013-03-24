@@ -28,11 +28,17 @@
   //@param ... the arguments for the function, the last one being NULL and all being pointers
   int rpi_pi_execute_forker(void *(*fp)(va_list*), ...);
 
+  //@brief wrapper for execlp, runs given command as given user
+  //@param user the user to run the command as
+  //@param cmd the command to run as the given user
+  void rpi_pi_execute_su_c(char */user*/, char */*cmd*/);
+
   //short function names
   #ifdef RPI_PI_EXECUTE_SHORT_NAMES
     #define lpq(...) rpi_pi_execute_lpq(__VA_ARGS__)
     #define lpr(...) rpi_pi_execute_lpr(__VA_ARGS__)
     #define lprm(...) rpi_pi_execute_lprm(__VA_ARGS__)
     #define forker(...) rpi_pi_execute_forker(__VA_ARGS__)
+    #define su_c(...) rpi_pi_execute_su_c(__VA_ARGS__)
   #endif
 #endif

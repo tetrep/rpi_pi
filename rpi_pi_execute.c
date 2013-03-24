@@ -87,6 +87,17 @@ int rpi_pi_execute_forker(void *(*fp)(va_list*), ...)
   return 0;
 }
 
+void rpi_pi_execute_su_c(char *user, char *cmd)
+{
+  //become user and execute cmd
+  execlp("su", user, "-c", cmd, NULL);
+
+  //we'll only get here if exec failed
+  printf("error!\n  user: %s\n  cmd: %s\n  errno: %i\n", user, cmd, errno);
+
+  return NULL;
+}
+
 //@TODO optimize string generation
 void *rpi_pi_execute_lpq(va_list *args)
 {
@@ -95,22 +106,22 @@ void *rpi_pi_execute_lpq(va_list *args)
   //get printer name
   char *printer = va_arg(*args, char*);
 
-  //plus 2 because we needt to close the ' and null terminate
-  char cmd[strlen("su ") + strlen(user) + strlen(" -c 'lpq -lP") + strlen(printer) + 2];
-  //build our command
-  cmd[0] = '\0';
-  strcat(cmd, "su ");
-  strcat(cmd, user);
-  strcat(cmd, " -c 'lpq -lP ");
-  strcat(cmd, printer);
-  strcat(cmd, "'");
+  //allocate lpq command, + 1 for \0
+  char cmd[strlen("lpq -lP ") + strlen(printer) + 1];
 
-  system(cmd);
+  //make it an empty cstring
+  lpqc[0] = '\0';
+  //build cmd
+  strcat(cmd, "lpq -lP ");
+  strcat(cmd, printer);
+  
+  //run cmd as user
+  rpi_pi_execute_su_c(user, cmd);
 
   return NULL;
 }
 
-//@TODO optimize string generation
+//@TODO optimize string generation, 1 write or n writes?
 void* rpi_pi_execute_lpr(va_list *args)
 {
   //get user name
@@ -119,22 +130,21 @@ void* rpi_pi_execute_lpr(va_list *args)
   char *printer = va_arg(*args, char*);
   //get file name
   char *file = va_arg(*args, char*);
+  //allocate memory for command, +1 for space and +1 for \0
+  char cmd[strlen("lpr -P ") + strlen(printer) + 1 + strlen(filename) + 1];
 
   //temp file name
   char *filename = "test.postyscripts";
 
-  //plus 2 because we needt to close the ' and null terminate
-  char cmd[strlen("su ") + strlen(user) + strlen(" -c 'lpr -P ") + strlen(printer) + strlen(filename) + 2];
-  int fd, x;
-
   //save postscript file for later printing/troubleshooting
-  fd = creat(filename, 0660);
+  int x, fd = creat(filename, 0660);
   if(fd != -1)
   {
     x = 0;
-    while(((char *) file)[x] != '\0')
+    //keep going until we reach the end
+    while(file[x] != '\0')
     {
-      write(fd, &((char *) file)[x], 1);
+      write(fd, &file[x], 1);
       x++;
     }
   }
@@ -142,16 +152,15 @@ void* rpi_pi_execute_lpr(va_list *args)
   //we're done with the file
   close(fd);
 
-  //build our command
+  //make lprc an empty cstring
   cmd[0] = '\0';
-  strcat(cmd, "su ");
-  strcat(cmd, user);
-  strcat(cmd, " -c 'lpr -P ");
+  strcat(cmd, "lpr -P ");
   strcat(cmd, printer);
+  strcat(cmd, " ");
   strcat(cmd, filename);
-  strcat(cmd, "'");
-
-  system(cmd);
+  
+  //run cmd as user
+  rpi_pi_execute_su_c(user, cmd);
 
   return NULL;
 }
@@ -166,20 +175,18 @@ void *rpi_pi_execute_lprm(va_list *args)
   //get job id
   char *job = va_arg(*args, char*);
 
-  //plus 2 because we needt to close the ' and null terminate
-  char cmd[strlen("su ") + strlen(user) + strlen(" -c 'lprm -P ") + strlen(printer) + strlen(job) + 2];
+  //allocate memory for command, +1 for space +1 for \0
+  char cmd[strlen(" -c 'lprm -P ") + strlen(printer) + 1 + strlen(job) + 1];
 
-  //build our command
+  //make it an empty cstring
   cmd[0] = '\0';
-  strcat(cmd, "su ");
-  strcat(cmd, user);
   strcat(cmd, " -c 'lprm -P ");
   strcat(cmd, printer);
   strcat(cmd, " ");
   strcat(cmd, job);
-  strcat(cmd, "'");
 
-  system(cmd);
+  //run cmd as user
+  rpi_pi_execute_su_c(user, cmd);
 
   return NULL;
 }

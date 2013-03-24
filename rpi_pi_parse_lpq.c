@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-//@TODO optimize
+//@TODO optimize, only search start of line, use printer
 char** rpi_pi_parse_lpq_job_tok(char *user, char *printer)
 {
   //one line of input from lpq
