@@ -31,7 +31,7 @@
   //@brief wrapper for execlp, runs given command as given user
   //@param user the user to run the command as
   //@param cmd the command to run as the given user
-  void rpi_pi_execute_su_c(char */user*/, char */*cmd*/);
+  void rpi_pi_execute_su_c(char */*user*/, char */*cmd*/);
 
   //short function names
   #ifdef RPI_PI_EXECUTE_SHORT_NAMES

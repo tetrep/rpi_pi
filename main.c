@@ -46,6 +46,7 @@ int main(int argc, char **argv)
   error = (int) lprm("paul", "vcpltg", "cheese");
   printf("THE LPRM ERROR: %i\n", error);
   printf("=====\n");
+  */
 
   //check forck function and execute lpq
   error = forker(rpi_pi_execute_lpq, "paul", "vcpltg", NULL);
@@ -56,7 +57,7 @@ int main(int argc, char **argv)
   error = forker(rpi_pi_execute_lprm, "paul", "vcpltg", "cheese", NULL);
   printf("THE FORKER LPRM ERROR: %i\n", error);
   printf("=====\n");
-  */
+  /**/
 
   //attempt to parse lpq from stdin
   test_parse = rpi_pi_parse_lpq_job_tok("majumr", "vcplt");

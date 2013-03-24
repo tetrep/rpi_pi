@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <errno.h>
 
 //forks on the given function and redirects its stdout to us
 int rpi_pi_execute_forker(void *(*fp)(va_list*), ...)
@@ -44,11 +45,14 @@ int rpi_pi_execute_forker(void *(*fp)(va_list*), ...)
       //close read end, we want to write
       close(pipefd[0]);
 
+      //no debugging!
+      fclose(stderr);
+
       //redirect stdout
       fclose(stdout);
-
       stdout = fdopen(pipefd[1], "w");
 
+      //did the redirection work?
       if(stdout == NULL)
         exit(-1);
 
@@ -79,9 +83,6 @@ int rpi_pi_execute_forker(void *(*fp)(va_list*), ...)
 
       //wait for child
       wait(NULL);
-
-      //close our end of the pipe
-      close(pipefd[0]);
   }
 
   return 0;
@@ -94,8 +95,6 @@ void rpi_pi_execute_su_c(char *user, char *cmd)
 
   //we'll only get here if exec failed
   printf("error!\n  user: %s\n  cmd: %s\n  errno: %i\n", user, cmd, errno);
-
-  return NULL;
 }
 
 //@TODO optimize string generation
@@ -110,7 +109,7 @@ void *rpi_pi_execute_lpq(va_list *args)
   char cmd[strlen("lpq -lP ") + strlen(printer) + 1];
 
   //make it an empty cstring
-  lpqc[0] = '\0';
+  cmd[0] = '\0';
   //build cmd
   strcat(cmd, "lpq -lP ");
   strcat(cmd, printer);
@@ -130,11 +129,10 @@ void* rpi_pi_execute_lpr(va_list *args)
   char *printer = va_arg(*args, char*);
   //get file name
   char *file = va_arg(*args, char*);
-  //allocate memory for command, +1 for space and +1 for \0
-  char cmd[strlen("lpr -P ") + strlen(printer) + 1 + strlen(filename) + 1];
-
   //temp file name
   char *filename = "test.postyscripts";
+  //allocate memory for command, +1 for space and +1 for \0
+  char cmd[strlen("lpr -P ") + strlen(printer) + 1 + strlen(filename) + 1];
 
   //save postscript file for later printing/troubleshooting
   int x, fd = creat(filename, 0660);
@@ -176,11 +174,11 @@ void *rpi_pi_execute_lprm(va_list *args)
   char *job = va_arg(*args, char*);
 
   //allocate memory for command, +1 for space +1 for \0
-  char cmd[strlen(" -c 'lprm -P ") + strlen(printer) + 1 + strlen(job) + 1];
+  char cmd[strlen("lprm -P ") + strlen(printer) + 1 + strlen(job) + 1];
 
   //make it an empty cstring
   cmd[0] = '\0';
-  strcat(cmd, " -c 'lprm -P ");
+  strcat(cmd, "lprm -P ");
   strcat(cmd, printer);
   strcat(cmd, " ");
   strcat(cmd, job);
