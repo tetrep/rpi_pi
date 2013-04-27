@@ -74,7 +74,7 @@ std::tuple<parse_cgi::key_value_data::key_value_type, size_t> parse_cgi::key_val
 }
 
 //@todo throw meaningful exceptions, handle exceptions
-parse_cgi::key_value_data::key_type parse_cgi::key_value_data::get_url_encoded_key(const &std::string url_encoded, const size_t index) throw(std::exception)
+parse_cgi::key_value_data::key_type parse_cgi::key_value_data::get_url_encoded_value(const &std::string url_encoded, const size_t index) throw(std::exception)
 {
   try
   {
