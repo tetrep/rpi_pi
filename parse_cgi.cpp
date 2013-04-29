@@ -76,7 +76,6 @@ void parse_cgi::key_value_data::parse_and_add(const std::string &url_encoded) th
 
 //@todo throw meaningful exceptions, handle exceptions
 //@unique_ptr
-//@state_dependent
 std::unique_ptr<std::tuple<std::unique_ptr<parse_cgi::key_value_data::key_value_type>, size_t> > parse_cgi::key_value_data::parse_key_value(const std::string &url_encoded, const size_t index) throw(std::exception)
 {
   try
@@ -96,15 +95,12 @@ std::unique_ptr<std::tuple<std::unique_ptr<parse_cgi::key_value_data::key_value_
 
 //@todo throw meaningful exceptions, handle exceptions
 //@unique_ptr
-//@state_dependent
 std::unique_ptr<parse_cgi::key_value_data::key_type> parse_cgi::key_value_data::get_url_encoded_key(const std::string &url_encoded, const size_t index) throw(std::exception)
 {
   try
   {
     //starting at index, generate a substring until we hit an '=' or the end of the string, this is our key, return it
-    //BOOKMARK
-    //@state_dependent, constructor key_type::key_type(std::string) exists
-    return std::unique_ptr<key_type>(new key_type(url_encoded.substr(index, std::min(url_encoded.find_first_of("=", index), url_encoded.size()) - index));
+    return std::unique_ptr<key_type>(new key_type(url_encoded.substr(index, std::min(url_encoded.find_first_of("=", index), url_encoded.size()) - index)));
   }
   catch(const std::exception &e)
   {
@@ -115,13 +111,11 @@ std::unique_ptr<parse_cgi::key_value_data::key_type> parse_cgi::key_value_data::
 
 //@todo throw meaningful exceptions, handle exceptions
 //@unique_ptr
-//@state_dependent
 std::unique_ptr<parse_cgi::key_value_data::value_type> parse_cgi::key_value_data::get_url_encoded_value(const std::string &url_encoded, const size_t index) throw(std::exception)
 {
   try
   {
     //return a string starting at the given index and stopping before the first '&' or ';' or the end of url_encoded
-    //@state_dependent, constructor value_type::value_type(std::string) exists
     return std::unique_ptr<value_type>(new value_type(url_encoded.substr(index, std::min(url_encoded.find_first_of("&;", index), url_encoded.size()) - index));
   }
   catch(const std::exception &e)
@@ -149,13 +143,11 @@ void parse_cgi::key_value_data::add_key_value(const key_type &key, const value_t
 
 //@todo throw meaningful exceptions, handle exceptions
 //@unique_ptr
-//@state_dependent
 void parse_cgi::key_value_data::add_key_value(std::unique_ptr key_value) throw(std::exception)
 {
   try
   {
     //push the tuple to the back of our list
-    //@state_dependent, function key_value_container_type::push_back(key_value_type) exists
     this->key_values.push_back(key_value);
   }
   catch(const std::exception &e)
@@ -166,12 +158,10 @@ void parse_cgi::key_value_data::add_key_value(std::unique_ptr key_value) throw(s
 }
 
 //@todo throw meaningful exceptions, handle exceptions
-//@state_dependent
 parse_cgi::key_value_data::key_value_container_type::iterator parse_cgi::key_value_data::get_iterator() throw(std::exception)
 {
   try
   {
-    //STATE_DEPENDET
     return this->key_values.begin();
   }
   catch(const std::exception &e)
