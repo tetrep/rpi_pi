@@ -1,9 +1,11 @@
-#include "parse_cgi.hpp"
+#include "parse_cgi.hpp" //for parse_cgi::key_value_data
 
-#include <exception>
-#include <tuple>
-#include <string>
-#include <vector>
+#include <exception> //for std::exception
+#include <tuple> //for std::tuple, std::get
+#include <string> //for std::string
+#include <list> //for std::list
+#include <memory> //for std::unique_ptr
+#include <algorithm> //for std::min
 
 //if i ever feel like indenting everything
 //i should put this all in the parse_cgi namespace
@@ -31,52 +33,55 @@ parse_cgi::key_value_data::key_value_data(const std::string &url_encoded) throw(
 
 //fill the container with key-value pairs from url_encoded
 //@todo throw meaningful exceptions, handle exceptions
-//STATE_DEPENDENT_FUNCTION
+//@unique_ptr
 void parse_cgi::key_value_data::parse_and_add(const std::string &url_encoded) throw(std::exception)
 {
   //index to start look for key value pairs with
   size_t index = 0;
   //our return data
-  std::tuple<key_value_type, size_t> return_data = std::make_tuple((key_value_type) NULL, (size_t) NULL;
+  std::unique_ptr<std::tuple<key_value_type, size_t> > return_data;
 
   try
   {
     //start looking for key-value pairs from index 0, afterwards start looking for the next key-value pair from the end of the last found key-value pair
-    for(index = 0; index < url_encoded.size()-1; index = std::get<2>(return_data))
+    //an exception will be thrown when we reach the end
+    index = 0;
+    while(true)
     {
       //get a key_value from the string at the given index
-      //STATE_DEPENDENT
       return_data = parse_key_value(url_encoded, index);
 
-      //if the key_value isn't null, add it to our container
-      if(std::get<1>(*return_data) != NULL)
-        this->add_key_value(std::get<1>(return_data));
-      //we ran out of key-value pairs, setting this will kill the for loop
-      else
-        std::get<2>(return_data) = url_encoded.size();
+      //add the key_value to our container
+      this->add_key_value(std::get<0>(*return_data));
+
+      //set index to one after the end of the returned value
+      index = std::get<1>(*return_data) + 1;
     }
   }
   catch(const std::exception &e)
   {
-    //something bad happened, reset the container
-    this->clear_key_values();
+    //the exception was not from reaching the end
+    //RECONCILE PLOX
+    if(true)
+    {
+      //something bad happened, reset the container
+      this->clear_key_values();
 
-    //somebody else's problem...
-    throw e;
+      //somebody else's problem...
+      throw e;
+    }
   }
 }
 
 //@todo throw meaningful exceptions, handle exceptions
-//STATE_DEPENDENT_FUNCTION
-std::tuple<parse_cgi::key_value_data::key_value_type, size_t> parse_cgi::key_value_data::parse_key_value(const std::string &url_encoded, const size_t index) throw(std::exception)
+//@unique_ptr
+std::unique_ptr<std::tuple<parse_cgi::key_value_data::key_value_type, size_t> > parse_cgi::key_value_data::parse_key_value(const std::string &url_encoded, const size_t index) throw(std::exception)
 {
   try
   {
     //return a tuple consisting of the first key after the given index and the first value after the given index
-    //STATE_DEPENDENT
-    //MEMORY_MANAGEMENT
-    //return new key_value_type(get_url_encoded_key(url_encoded, index), get_url_encoded_value(url_encoded, index));
-    return std::make_tuple(get_url_encoded_key(url_encoded, index), get_url_encoded_value(url_encoded, index));
+    //RECONCILE
+    return NULL;
   }
   catch(const std::exception &e)
   {
@@ -86,12 +91,15 @@ std::tuple<parse_cgi::key_value_data::key_value_type, size_t> parse_cgi::key_val
 }
 
 //@todo throw meaningful exceptions, handle exceptions
-parse_cgi::key_value_data::key_type parse_cgi::key_value_data::get_url_encoded_value(const std::string &url_encoded, const size_t index) throw(std::exception)
+//@unique_ptr
+//@state_dependent
+std::unique_ptr<parse_cgi::key_value_data::key_type> parse_cgi::key_value_data::get_url_encoded_key(const std::string &url_encoded, const size_t index) throw(std::exception)
 {
   try
   {
-    //starting at index, generate a substring until we hit an '=', this is our key, return it
-    return url_encoded.substr(index, url_encoded.find_first_of("=", index) - index);
+    //starting at index, generate a substring until we hit an '=' or the end of the string, this is our key, return it
+    //@state_dependent
+    return std::unique_ptr<key_type>(new key_type(url_encoded.substr(index, std::min(url_encoded.find_first_of("=", index), url_encoded.size()) - index));
   }
   catch(const std::exception &e)
   {
@@ -101,14 +109,15 @@ parse_cgi::key_value_data::key_type parse_cgi::key_value_data::get_url_encoded_v
 }
 
 //@todo throw meaningful exceptions, handle exceptions
-parse_cgi::key_value_data::key_type parse_cgi::key_value_data::get_url_encoded_key(const std::string &url_encoded, const size_t index) throw(std::exception)
+//@unique_ptr
+//@state_dependent
+std::unique_ptr<parse_cgi::key_value_data::value_type> parse_cgi::key_value_data::get_url_encoded_value(const std::string &url_encoded, const size_t index) throw(std::exception)
 {
   try
   {
-    //we want the string between the first '=' and the first '&' or ';', this is our value
-    size_t temp_index = url_encoded.find_first_of("=", index);
-    //construct a string starting after the first '=' and stopping before the first '&' or ';'
-    return url_encoded.substr(temp_index+1, url_encoded.find_first_of("&;", temp_index) - temp_index+1);
+    //return a string starting at the given index and stopping before the first '&' or ';' or the end of url_encoded
+    //@state_dependent
+    return std::unique_ptr<value_type>(new value_type(url_encoded.substr(index, std::min(url_encoded.find_first_of("&;", index), url_encoded.size()) - index));
   }
   catch(const std::exception &e)
   {
@@ -118,12 +127,13 @@ parse_cgi::key_value_data::key_type parse_cgi::key_value_data::get_url_encoded_k
 }
 
 //@todo throw meaningful exceptions, handle exceptions
+//@unique_ptr
 void parse_cgi::key_value_data::add_key_value(const key_type &key, const value_type &value) throw(std::exception)
 {
   try
   {
     //give our sister function a tuple of the given key-value pair
-    this->add_key_value(std::make_tuple(key, value));
+    this->add_key_value(std::unique_ptr<key_value_type>(new key_value_type(key, value)));
   }
   catch(const std::exception &e)
   {
@@ -133,7 +143,8 @@ void parse_cgi::key_value_data::add_key_value(const key_type &key, const value_t
 }
 
 //@todo throw meaningful exceptions, handle exceptions
-//STATE_DEPENDENT_FUNCTION
+//@unique_ptr
+//@state_dependent
 void parse_cgi::key_value_data::add_key_value(const key_value_type &key_value) throw(std::exception)
 {
   try
