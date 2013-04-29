@@ -75,13 +75,13 @@ void parse_cgi::key_value_data::parse_and_add(const std::string &url_encoded) th
 
 //@todo throw meaningful exceptions, handle exceptions
 //@unique_ptr
-std::unique_ptr<std::tuple<parse_cgi::key_value_data::key_value_type, size_t> > parse_cgi::key_value_data::parse_key_value(const std::string &url_encoded, const size_t index) throw(std::exception)
+std::unique_ptr<std::tuple<std::unique_ptr<parse_cgi::key_value_data::key_value_type>, size_t> > parse_cgi::key_value_data::parse_key_value(const std::string &url_encoded, const size_t index) throw(std::exception)
 {
   try
   {
-    //return a tuple consisting of the first key after the given index and the first value after the given index
+    //return a unique_ptr of the key_value_type consisting of the first key after the given index and the first value after the given index
     //RECONCILE
-    return NULL;
+    std::unique_ptr<key_type>
   }
   catch(const std::exception &e)
   {
@@ -132,7 +132,7 @@ void parse_cgi::key_value_data::add_key_value(const key_type &key, const value_t
 {
   try
   {
-    //give our sister function a tuple of the given key-value pair
+    //give our sister function a unique_ptr
     this->add_key_value(std::unique_ptr<key_value_type>(new key_value_type(key, value)));
   }
   catch(const std::exception &e)
@@ -145,12 +145,12 @@ void parse_cgi::key_value_data::add_key_value(const key_type &key, const value_t
 //@todo throw meaningful exceptions, handle exceptions
 //@unique_ptr
 //@state_dependent
-void parse_cgi::key_value_data::add_key_value(const key_value_type &key_value) throw(std::exception)
+void parse_cgi::key_value_data::add_key_value(std::unique_ptr key_value) throw(std::exception)
 {
   try
   {
-    //push the tuple to the back of our vector
-    //STATE_DEPENDENT
+    //push the tuple to the back of our list
+    //@state_dependent
     this->key_values.push_back(key_value);
   }
   catch(const std::exception &e)
@@ -161,7 +161,7 @@ void parse_cgi::key_value_data::add_key_value(const key_value_type &key_value) t
 }
 
 //@todo throw meaningful exceptions, handle exceptions
-//STATE_DEPENDENT_FUNCTION
+//@state_dependent
 parse_cgi::key_value_data::key_value_container_type::iterator parse_cgi::key_value_data::get_iterator() throw(std::exception)
 {
   try
