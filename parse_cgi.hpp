@@ -1,10 +1,11 @@
 #ifndef PARSE_CGI_HPP
   #define PARSE_CGI_HPP
 
-  #include <exception>
-  #include <utility> //for tuples
-  #include <vector>
-  #include <string>
+  #include <exception> //for std::exception
+  #include <utility> //for std::pair
+  #include <unordered_map> //for std::unordered_map
+  #include <string> //for std::string
+  #include <memory> //for std::unique_ptr
 
   //our lovely home
   namespace parse_cgi
@@ -17,9 +18,9 @@
       //the type of our values
       using value_type = std::string;
       //the type of our key-value pairs
-      using key_value_type = std::tuple<key_type, value_type>;
+      using key_value_type = std::pair<key_type, value_type>;
       //the type of our container
-      using key_value_container_type = std::vector<key_value_type>;
+      using key_value_container_type = std::unordered_map<key_type, value_type>;
 
       public:
         //@brief default constructor
@@ -32,42 +33,42 @@
         //@param url_encoded a url-encoded string of key_value pairs
         void parse_and_add(const std::string &url_encoded) throw(std::exception);
 
-        //@brief add a key_value to our data structure
+        //@brief add a key and value to our data structure
         //@param key the key to be added
         //@param value the value to be added
         void add_key_value(const key_type &key, const value_type &value) throw(std::exception);
-        //@brief add a key_value to our data structure from a tuple
-        //@param key_value the key-value pair to be added
+        //@brief add a key_value to our data structure from a pair
+        //@param key_value the pair containing the key-value pair to be added
         void add_key_value(const key_value_type &key_value) throw(std::exception);
-        void clear_key_values() throw(std::exception);
+        //@brief empties our container of all key-value pairs
+        void clear_key_value_container() throw(std::exception);
 
         //return an iterator to the data structure
         //@return returns an iterator to the data structure holding our key-value pairs
-        key_value_container_type::iterator get_iterator();
+        key_value_container_type::iterator get_iterator() throw(std::exception);
 
         //our helper functions
-        //@brief return the first key_value found in the given string starting at the given index
+        //@brief return the first key-value pair found in the given string starting at the given index
         //@param url_encoded a url-encoded string
         //@param index the location (inclusive) to start looking for a key_value
-        //@return returns a pointer to the first key-value pair found
-        //@MEMORY_MANAGEMENT
-        key_value_type* parse_key_value(const std::string &url_encoded, const unsigned int index) const;
+        //@return returns the first key-value pair found
+        key_value_type get_url_encoded_key_value(const std::string &url_encoded, const size_t index) throw(std::exception);
         //@brief return the first key found in the given string starting at the given index
         //@param url_encoded a url-encoded string
         //@param index the location (inclusive) to start looking for a key
         //@return returns a pointer to the first key found
-        //@MEMORY_MANAGEMENT
-        key_type* get_url_encoded_key(const std::string &url_encoded, const unsigned int index) const;
+        //@unique_ptr
+        std::unique_ptr<key_type> get_url_encoded_key(const std::string &url_encoded, const size_t index) throw(std::exception);
         //@brief return the first value found in the given string starting at the given index
         //@param url_encoded a url-encoded string
         //@param index the location (inclusive) to start looking for a key
         //@return returns a pointer to the first value found
-        //@MEMORY_MANAGEMENT
-        value_type* get_url_encoded_value(const std::string &url_encoded, const unsigned int index) const;
+        //@unique_ptr
+        std::unique_ptr<value_type> get_url_encoded_value(const std::string &url_encoded, const size_t index) throw(std::exception);
 
       private:
-        //vector of all the key/value pairs (tuples) we have found so far
-        key_value_container_type key_values;
+        //where we will store all our key-value pairs
+        key_value_container_type key_value_container;
     };
 
     //@brief returns the value of the given encironment variable
