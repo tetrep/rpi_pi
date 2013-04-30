@@ -1,12 +1,15 @@
-#include "parse_cgi.hpp" //for parse_cgi::key_value_data
+#include "parse_cgi.hpp" //for parse_cgi namespace
 
 #include <exception> //for std::exception
 #include <utility> //for std::pair
 #include <string> //for std::string
 #include <unordered_map> //for std::unordered_map
 #include <memory> //for std::unique_ptr
-#include <algorithm> //for std::min
-#include <type_traits> //for static_assert, std::is_same
+#include <algorithm> //for std::min(), std::max()
+#include <type_traits> //for static_assert(), std::is_same
+#include <cstdlib> //for getenv()
+#include <iostream> //for std::in
+#include <iterator> //for std::istreambuf_iterator
 
 //if i ever feel like indenting everything
 //i should put this all in the parse_cgi namespace
@@ -18,7 +21,7 @@ parse_cgi::key_value_data::key_value_data()
 
 //fills the container with key-value pairs from url_encoded
 //@todo throw meaningful exceptions, handle exceptions
-parse_cgi::key_value_data::key_value_data(const std::string &url_encoded) throw(std::exception)
+parse_cgi::key_value_data::key_value_data(const std::string &url_encoded)
 {
   try
   {
@@ -28,13 +31,13 @@ parse_cgi::key_value_data::key_value_data(const std::string &url_encoded) throw(
   catch(const std::exception &e)
   {
     //somebody else's problem...
-    throw e;
+    throw;
   }
 }
 
 //fill the container with key-value pairs from url_encoded //@todo throw meaningful exceptions, handle exceptions
 //@unique_ptr
-void parse_cgi::key_value_data::parse_and_add(const std::string &url_encoded) throw(std::exception)
+void parse_cgi::key_value_data::parse_and_add(const std::string &url_encoded)
 {
   //index to start look for key value pairs with
   size_t index = 0;
@@ -60,31 +63,37 @@ void parse_cgi::key_value_data::parse_and_add(const std::string &url_encoded) th
       //we are relying on std::string::substr to throw an exception after we increment index too far, thus kicking us out of the loop
       index += key_value.first.size() + key_value.second.size() + 2;
 
-      try
-      {
-        //add the key_value to our container
-        this->add_key_value(key_value);
-      }
-      catch(const std::exception &e)
-      {
-        //something bad happened, reset the container
-        this->clear_key_value_container();
-
-        //somebody else's problem...
-        throw e;
-      }
+      //add the key_value to our container
+      this->add_key_value(key_value);
     }
   }
+  //it's benign, no problems
+  catch(const cgi_benign &e)
+  {
+    //we don't have any problems, just leave the function
+    return;
+  }
+  //we ran out of memory :(
+  catch(const std::bad_alloc &e)
+  {
+    //free up our container in case somebody else needs memory
+    //while we unwind the stack
+    this->clear_key_value_container();
+
+    //somebody else's problem...
+    throw;
+  }
+  //not a memory issue, we can keep our key-value pairs
   catch(const std::exception &e)
   {
     //somebody else's problem...
-    throw e;
+    throw;
   }
 }
 
 //@todo throw meaningful exceptions, handle exceptions
 //@unique_ptr
-parse_cgi::key_value_data::key_value_type parse_cgi::key_value_data::get_url_encoded_key_value(const std::string &url_encoded, const size_t index) throw(std::exception)
+parse_cgi::key_value_data::key_value_type parse_cgi::key_value_data::get_url_encoded_key_value(const std::string &url_encoded, const size_t index)
 {
   try
   {
@@ -98,50 +107,60 @@ parse_cgi::key_value_data::key_value_type parse_cgi::key_value_data::get_url_enc
   catch(const std::exception &e)
   {
     //somebody else's problem...
-    throw e;
+    throw;
   }
 }
 
 //@todo throw meaningful exceptions, handle exceptions
 //@unique_ptr
-std::unique_ptr<parse_cgi::key_value_data::key_type> parse_cgi::key_value_data::get_url_encoded_key(const std::string &url_encoded, const size_t index) throw(std::exception)
+std::unique_ptr<parse_cgi::key_value_data::key_type> parse_cgi::key_value_data::get_url_encoded_key(const std::string &url_encoded, const size_t index)
 {
   try
   {
     //starting at index, generate a substring until we hit an '=' or the end of the string, this is our key, return it
     //find_first_of returns std::string::npos, which is size_t - 1, if it
-    //doesn't find anything we just return the rest of the string, this
-    //means exceptions are all fatal, this will not always be the case
+    //doesn't find anything we just return the rest of the string
     return std::unique_ptr<key_type>(new key_type(url_encoded.substr(index, std::min(url_encoded.find_first_of("=", index), url_encoded.size()-1) - index)));
+  }
+  //to whom it may concern, nothing bad happened
+  catch(const std::out_of_range &e)
+  {
+    //somebody elses's not problem...
+    throw cgi_benign();
   }
   catch(const std::exception &e)
   {
     //somebody else's problem...
-    throw e;
+    throw;
   }
 }
 
 //@todo throw meaningful exceptions, handle exceptions
 //@unique_ptr
-std::unique_ptr<parse_cgi::key_value_data::value_type> parse_cgi::key_value_data::get_url_encoded_value(const std::string &url_encoded, const size_t index) throw(std::exception)
+std::unique_ptr<parse_cgi::key_value_data::value_type> parse_cgi::key_value_data::get_url_encoded_value(const std::string &url_encoded, const size_t index)
 {
   try
   {
     //return a string starting at the given index and stopping before the first '&' or ';' or the end of url_encoded
     //find_first_of returns std::string::npos, which is size_t - 1, if it
-    //doesn't find anything we just return the rest of the string, this
-    //means exceptions are all fatal, this will not always be the case
+    //doesn't find anything we just return the rest of the string
     return std::unique_ptr<value_type>(new value_type(url_encoded.substr(index, std::min(url_encoded.find_first_of("&;", index), url_encoded.size()) - index)));
+  }
+  //to whom it may concern, nothing bad happened
+  catch(const std::out_of_range &e)
+  {
+    //somebody elses's not problem...
+    throw cgi_benign();
   }
   catch(const std::exception &e)
   {
     //somebody else's problem...
-    throw e;
+    throw;
   }
 }
 
 //@todo throw meaningful exceptions, handle exceptions
-void parse_cgi::key_value_data::add_key_value(const key_type &key, const value_type &value) throw(std::exception)
+void parse_cgi::key_value_data::add_key_value(const key_type &key, const value_type &value)
 {
   try
   {
@@ -154,12 +173,12 @@ void parse_cgi::key_value_data::add_key_value(const key_type &key, const value_t
   catch(const std::exception &e)
   {
     //somebody else's problem...
-    throw e;
+    throw;
   }
 }
 
 //@todo throw meaningful exceptions, handle exceptions
-void parse_cgi::key_value_data::add_key_value(const key_value_type &key_value) throw(std::exception)
+void parse_cgi::key_value_data::add_key_value(const key_value_type &key_value)
 {
   try
   {
@@ -169,26 +188,42 @@ void parse_cgi::key_value_data::add_key_value(const key_value_type &key_value) t
   catch(const std::exception &e)
   {
     //somebody else's problem...
-    throw e;
+    throw;
   }
 }
 
 //@todo throw meaningful exceptions, handle exceptions
-parse_cgi::key_value_data::key_value_container_type::iterator parse_cgi::key_value_data::get_iterator() throw(std::exception)
+parse_cgi::key_value_data::key_value_container_type::iterator parse_cgi::key_value_data::begin()
 {
   try
   {
+    //return an iterator pointing to the beginning of the container
     return this->key_value_container.begin();
   }
   catch(const std::exception &e)
   {
     //somebody else's problem...
-    throw e;
+    throw;
   }
 }
 
 //@todo throw meaningful exceptions, handle exceptions
-void parse_cgi::key_value_data::clear_key_value_container() throw(std::exception)
+parse_cgi::key_value_data::key_value_container_type::iterator parse_cgi::key_value_data::end()
+{
+  try
+  {
+    //return an iterator pointing to the end of the container
+    return this->key_value_container.end();
+  }
+  catch(const std::exception &e)
+  {
+    //somebody else's problem...
+    throw;
+  }
+}
+
+//@todo throw meaningful exceptions, handle exceptions
+void parse_cgi::key_value_data::clear_key_value_container()
 {
   try
   {
@@ -198,6 +233,60 @@ void parse_cgi::key_value_data::clear_key_value_container() throw(std::exception
   catch(const std::exception &e)
   {
     //somebody else's problem...
-    throw e;
+    throw;
   }
+}
+//@todo throw meaningful exceptions, handle exceptions
+std::string parse_cgi::get_url_encoded_string()
+{
+  try
+  {
+    //how did we get the data?
+    std::string request_method = get_environment_variable("REQUEST_METHOD");
+
+    //was the data sent to us via GET?
+    if(request_method.compare("GET") == 0)
+    {
+      //return the data stored in the environment variable QUERY_STRING
+      return get_environment_variable("QUERY_STRING");
+    }
+    //was the data sent to us via POST?
+    else if(request_method.compare("POST") == 0)
+    {
+      //construct and return a string using a range, the start of which is the start of std::cin and the end of which is the end of std::cin as calculated by via the amount of readable characters in the buffer returned by in_avail()
+      //in_avail() can return -1 so we will just use std::max()
+      return std::string(std::istreambuf_iterator<char>(std::cin.rdbuf()), std::istreambuf_iterator<char>(std::cin.rdbuf()+std::max(std::cin.rdbuf()->in_avail(), (std::streamsize) 0)));
+    }
+    //something bad happened
+    //this should be meaningful
+    else
+    {
+      throw std::exception();
+    }
+  }
+  catch(const std::exception &e)
+  {
+    //somebody else's problem...
+    throw;
+  }
+}
+
+//@todo throw meaningful exceptions, handle exceptions
+std::string parse_cgi::get_environment_variable(const std::string &env)
+{
+  try
+  {
+    //return std::string(getenv(env.c_str()));
+    return "POST";
+  }
+  catch(const std::exception &e)
+  {
+    //somebody else's problem...
+    throw;
+  }
+}
+
+const char* parse_cgi::cgi_benign::what() const noexcept
+{
+  return "nothing wrong here";
 }

@@ -27,48 +27,57 @@
         key_value_data();
         //@brief adds all the key_value pairs in url_encoded to our class container
         //@param url_encoded a url-encoded string of key_value pairs
-        key_value_data(const std::string &url_encoded) throw(std::exception);
+        key_value_data(const std::string &url_encoded);
 
         //@brief add all the key_value pairs in url_encoded to our class container
         //@param url_encoded a url-encoded string of key_value pairs
-        void parse_and_add(const std::string &url_encoded) throw(std::exception);
+        void parse_and_add(const std::string &url_encoded);
 
         //@brief add a key and value to our data structure
         //@param key the key to be added
         //@param value the value to be added
-        void add_key_value(const key_type &key, const value_type &value) throw(std::exception);
+        void add_key_value(const key_type &key, const value_type &value);
         //@brief add a key_value to our data structure from a pair
         //@param key_value the pair containing the key-value pair to be added
-        void add_key_value(const key_value_type &key_value) throw(std::exception);
+        void add_key_value(const key_value_type &key_value);
         //@brief empties our container of all key-value pairs
-        void clear_key_value_container() throw(std::exception);
+        void clear_key_value_container();
 
-        //return an iterator to the data structure
-        //@return returns an iterator to the data structure holding our key-value pairs
-        key_value_container_type::iterator get_iterator() throw(std::exception);
+        //@brief get the begin() iterator from our container
+        //@return returns an iterator to the beginning of our container
+        key_value_container_type::iterator begin();
+        //@brief get the end() iterator from our container
+        //@return returns an iterator to the end of our container
+        key_value_container_type::iterator end();
 
         //our helper functions
         //@brief return the first key-value pair found in the given string starting at the given index
         //@param url_encoded a url-encoded string
         //@param index the location (inclusive) to start looking for a key_value
         //@return returns the first key-value pair found
-        key_value_type get_url_encoded_key_value(const std::string &url_encoded, const size_t index) throw(std::exception);
+        key_value_type get_url_encoded_key_value(const std::string &url_encoded, const size_t index);
         //@brief return the first key found in the given string starting at the given index
         //@param url_encoded a url-encoded string
         //@param index the location (inclusive) to start looking for a key
         //@return returns a pointer to the first key found
         //@unique_ptr
-        std::unique_ptr<key_type> get_url_encoded_key(const std::string &url_encoded, const size_t index) throw(std::exception);
+        std::unique_ptr<key_type> get_url_encoded_key(const std::string &url_encoded, const size_t index);
         //@brief return the first value found in the given string starting at the given index
         //@param url_encoded a url-encoded string
         //@param index the location (inclusive) to start looking for a key
         //@return returns a pointer to the first value found
         //@unique_ptr
-        std::unique_ptr<value_type> get_url_encoded_value(const std::string &url_encoded, const size_t index) throw(std::exception);
+        std::unique_ptr<value_type> get_url_encoded_value(const std::string &url_encoded, const size_t index);
 
       private:
         //where we will store all our key-value pairs
         key_value_container_type key_value_container;
+    };
+
+    //our custom exception class, not thrown when something bad happens
+    class cgi_benign : std::exception
+    {
+      const char* what() const noexcept;
     };
 
     //@brief returns the value of the given encironment variable
