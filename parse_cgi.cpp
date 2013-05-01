@@ -236,6 +236,7 @@ void parse_cgi::key_value_data::clear_key_value_container()
     throw;
   }
 }
+
 //@todo throw meaningful exceptions, handle exceptions
 std::string parse_cgi::get_url_encoded_string()
 {
@@ -254,7 +255,7 @@ std::string parse_cgi::get_url_encoded_string()
     else if(request_method.compare("POST") == 0)
     {
       //construct and return a string using a range, the start of which is the start of std::cin and the end of which is the end of std::cin as calculated by via the amount of readable characters in the buffer returned by in_avail()
-      //in_avail() can return -1 so we will just use std::max()
+      //the length of the content is stored in the environment variable CONTENT_LENGTH
       return std::string(std::istreambuf_iterator<char>(std::cin.rdbuf()), std::istreambuf_iterator<char>(std::cin.rdbuf()+std::max(std::cin.rdbuf()->in_avail(), (std::streamsize) 0)));
     }
     //something bad happened
@@ -276,8 +277,14 @@ std::string parse_cgi::get_environment_variable(const std::string &env)
 {
   try
   {
-    //return std::string(getenv(env.c_str()));
-    return "POST";
+    //need to save it so we can check if it is null
+    char *c_str = getenv(env.c_str());
+
+    //because the std::string::string really hates error checking
+    if(c_str == nullptr)
+      throw std::invalid_argument("std::string::string(const char *) cannot handle the awesomeness that is nullptr");
+
+    return std::string(c_str);
   }
   catch(const std::exception &e)
   {
