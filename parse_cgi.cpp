@@ -254,9 +254,16 @@ std::string parse_cgi::get_url_encoded_string()
     //was the data sent to us via POST?
     else if(request_method.compare("POST") == 0)
     {
-      //construct and return a string using a range, the start of which is the start of std::cin and the end of which is the end of std::cin as calculated by via the amount of readable characters in the buffer returned by in_avail()
-      //the length of the content is stored in the environment variable CONTENT_LENGTH
-      return std::string(std::istreambuf_iterator<char>(std::cin.rdbuf()), std::istreambuf_iterator<char>(std::cin.rdbuf()+std::max(std::cin.rdbuf()->in_avail(), (std::streamsize) 0)));
+      //no need to ask twice...
+      size_t content_length = std::atoi(get_environment_variable("CONTENT_LENGTH").c_str());
+
+      //we need to store our c_str because the std::string constructor is bad
+      std::unique_ptr<char> url_encoded(new char[content_length]);
+
+      //the length of the content is stored in the environment variable CONTENT_LENGTH, ask for this many characters from std::cin
+      std::cin.readsome(&(*url_encoded), content_length);
+      return std::string(&(*url_encoded));
+
     }
     //something bad happened
     //this should be meaningful
