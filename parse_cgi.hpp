@@ -84,8 +84,17 @@
     //@param env the name of the environment variable to get
     //@return returns a std::string of the value of the given environment variable
     std::string get_environment_variable(const std::string &env);
-    //@brief gets the url_encoded string from either stdin or the environment variable QUERY_STRING depending on the environment variable REQUEST_METHOD
-    //@return returns a std::string of url_encoded key-value pairs
+    //@brief gets the url-encoded data as a std::string
+    //@return returns a url-encoded std::string
     std::string get_url_encoded_string();
+    //@brief gets the url-encoded data as a string if it has been given to us via POST
+    //@return returns a url-encoded std::string
+    std::string get_url_encoded_string_via_get();
+    //@brief gets the url-encoded data as a string if it has been given to us via POST
+    //@return returns a url-encoded std::string
+    std::string get_url_encoded_string_via_post();
+    //@brief gets the url-encoded data as a string if it has been given to us via HEAD
+    //@return returns a url-encoded std::string
+    std::string get_url_encoded_string_via_head();
   }
 #endif

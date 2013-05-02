@@ -248,29 +248,80 @@ std::string parse_cgi::get_url_encoded_string()
     //was the data sent to us via GET?
     if(request_method.compare("GET") == 0)
     {
-      //return the data stored in the environment variable QUERY_STRING
-      return get_environment_variable("QUERY_STRING");
+      return get_url_encoded_string_via_get();
     }
     //was the data sent to us via POST?
     else if(request_method.compare("POST") == 0)
     {
-      //no need to ask twice...
-      size_t content_length = std::atoi(get_environment_variable("CONTENT_LENGTH").c_str());
-
-      //we need to store our c_str because the std::string constructor is bad
-      std::unique_ptr<char> url_encoded(new char[content_length]);
-
-      //the length of the content is stored in the environment variable CONTENT_LENGTH, ask for this many characters from std::cin
-      std::cin.readsome(&(*url_encoded), content_length);
-      return std::string(&(*url_encoded));
-
+      return get_url_encoded_string_via_post();
     }
-    //something bad happened
-    //this should be meaningful
+    //in case we decided to support HEAD
+    else if(request_method.compare("HEAD") == 0)
+    {
+      return get_url_encoded_string_via_head();
+    }
+    //we tried :(
     else
     {
-      throw std::exception();
+      throw std::runtime_error("REQUEST_METHOD has an invalid value of "+request_method);
     }
+  }
+  catch(const std::exception &e)
+  {
+    //somebody else's problem...
+    throw;
+  }
+}
+
+//@todo throw meaningful exceptions, handle exceptions
+std::string parse_cgi::get_url_encoded_string_via_get()
+{
+  try
+  {
+    //our url-encoded data is in the environment variable QUERY_STRING
+    return get_environment_variable("QUERY_STRING");
+  }
+  catch(const std::exception &e)
+  {
+    //somebody else's problem...
+    throw;
+  }
+}
+
+//@todo throw meaningful exceptions, handle exceptions
+std::string parse_cgi::get_url_encoded_string_via_post()
+{
+  try
+  {
+    //no need to ask twice...
+    size_t content_length = std::atoi(get_environment_variable("CONTENT_LENGTH").c_str());
+
+    //we need to store our c_str because the std::string constructor is bad
+    //we're going to abuse unique_ptr a little here...
+    std::unique_ptr<char> c_str(new char[content_length+1]);
+
+    //read content_length characters from stdin
+    std::cin.read(&(*c_str), content_length);
+    //make it a c_str
+    (&(*c_str))[content_length] = '\0';
+
+    //return our newly found data
+    return std::string(&(*c_str));
+  }
+  catch(const std::exception &e)
+  {
+    //somebody else's problem...
+    throw;
+  }
+}
+
+//@todo throw meaningful exceptions, handle exceptions
+std::string parse_cgi::get_url_encoded_string_via_head()
+{
+  try
+  {
+    //we don't support head...
+    throw std::logic_error("head is not supported");
   }
   catch(const std::exception &e)
   {
