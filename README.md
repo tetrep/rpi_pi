@@ -3,4 +3,10 @@ rpi_pi
 
 plain and boring interface for RPI's printers
 
-so far, looks like nasty switch will stay even after i've finished the stack lottery, my current 'hypothesis' is to have the function pointer take in 10 arguments and then cast it around to take less as necessary, this should leave room for 10 pointers on the stack.
+decided to break my c89(ish) prison for the cgi, i'll be using c++ sparingly to integrate it into the rest of the program. exceptions are nice.
+
+todo:
+-------
+minor refactoring to clean up some functions
+print out html
+kerberos authentication (frontend)
