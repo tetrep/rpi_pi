@@ -223,6 +223,16 @@ parse_cgi::key_value_data::key_value_container_type::iterator parse_cgi::key_val
 }
 
 //@todo throw meaningful exceptions, handle exceptions
+parse_cgi::key_value_data::value_type parse::cgi::key_value_data::get_value(const parse_cgi::key_value_data::key_type &key)
+{
+
+}
+
+//@todo throw meaningful exceptions, handle exceptions
+parse_cgi::key_value_data::value_type parse::cgi::key_value_data::pop_value(const parse_cgi::key_value_data::key_type &key)
+{
+
+}
 
 //@todo throw meaningful exceptions, handle exceptions
 void parse_cgi::key_value_data::clear_key_value_container()
