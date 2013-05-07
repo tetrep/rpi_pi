@@ -43,6 +43,16 @@
         //@brief empties our container of all key-value pairs
         void clear_key_value_container();
 
+        //@brief retrieve the value of the given key
+        //@param key the key of the desired value
+        //@return returns the matching value for the given key
+        value_type get_value(const key_type &key);
+
+        //@brief retrieve the value and remove the key-value pair
+        //@param key the key of the desired value
+        //@return returns the matching value for the given key
+        value_type pop_value(const key_type &key);
+
         //@brief get the begin() iterator from our container
         //@return returns an iterator to the beginning of our container
         key_value_container_type::iterator begin();
