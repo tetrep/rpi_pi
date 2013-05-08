@@ -84,8 +84,14 @@
         key_value_container_type key_value_container;
     };
 
-    //our custom exception class, not thrown when something bad happens
-    class cgi_benign : std::exception
+    //our custom exception class, for tail-end recursion
+    class benign_exception : std::exception
+    {
+      const char* what() const noexcept;
+    };
+
+    //our custom key-not-found exception class, for when we can't find() a key
+    class key_not_found_exception : std::exception
     {
       const char* what() const noexcept;
     };

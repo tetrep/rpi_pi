@@ -19,7 +19,6 @@ parse_cgi::key_value_data::key_value_data()
 {
 }
 
-//fills the container with key-value pairs from url_encoded
 //@todo throw meaningful exceptions, handle exceptions
 parse_cgi::key_value_data::key_value_data(const std::string &url_encoded)
 {
@@ -35,8 +34,7 @@ parse_cgi::key_value_data::key_value_data(const std::string &url_encoded)
   }
 }
 
-//fill the container with key-value pairs from url_encoded //@todo throw meaningful exceptions, handle exceptions
-//@unique_ptr
+//@todo optimize
 void parse_cgi::key_value_data::parse_and_add(const std::string &url_encoded)
 {
   //index to start look for key value pairs with
@@ -68,7 +66,7 @@ void parse_cgi::key_value_data::parse_and_add(const std::string &url_encoded)
     }
   }
   //it's benign, no problems
-  catch(const cgi_benign &e)
+  catch(const benign_exception &e)
   {
     //we don't have any problems, just leave the function
     return;
@@ -92,7 +90,6 @@ void parse_cgi::key_value_data::parse_and_add(const std::string &url_encoded)
 }
 
 //@todo throw meaningful exceptions, handle exceptions
-//@unique_ptr
 parse_cgi::key_value_data::key_value_type parse_cgi::key_value_data::get_url_encoded_key_value(const std::string &url_encoded, const size_t index)
 {
   try
@@ -112,7 +109,6 @@ parse_cgi::key_value_data::key_value_type parse_cgi::key_value_data::get_url_enc
 }
 
 //@todo throw meaningful exceptions, handle exceptions
-//@unique_ptr
 std::unique_ptr<parse_cgi::key_value_data::key_type> parse_cgi::key_value_data::get_url_encoded_key(const std::string &url_encoded, const size_t index)
 {
   try
@@ -126,7 +122,7 @@ std::unique_ptr<parse_cgi::key_value_data::key_type> parse_cgi::key_value_data::
   catch(const std::out_of_range &e)
   {
     //somebody elses's not problem...
-    throw cgi_benign();
+    throw benign_exception();
   }
   catch(const std::exception &e)
   {
@@ -136,7 +132,6 @@ std::unique_ptr<parse_cgi::key_value_data::key_type> parse_cgi::key_value_data::
 }
 
 //@todo throw meaningful exceptions, handle exceptions
-//@unique_ptr
 std::unique_ptr<parse_cgi::key_value_data::value_type> parse_cgi::key_value_data::get_url_encoded_value(const std::string &url_encoded, const size_t index)
 {
   try
@@ -150,7 +145,7 @@ std::unique_ptr<parse_cgi::key_value_data::value_type> parse_cgi::key_value_data
   catch(const std::out_of_range &e)
   {
     //somebody elses's not problem...
-    throw cgi_benign();
+    throw benign_exception();
   }
   catch(const std::exception &e)
   {
@@ -225,13 +220,59 @@ parse_cgi::key_value_data::key_value_container_type::iterator parse_cgi::key_val
 //@todo throw meaningful exceptions, handle exceptions
 parse_cgi::key_value_data::value_type parse::cgi::key_value_data::get_value(const parse_cgi::key_value_data::key_type &key)
 {
+  try
+  {
+    //the iterator to the key-value pair we are looking for
+    key_value_container::const_iterator it = this->key_value_container.find(key);
 
+    //if key_value_container.end() is returned, we didn't find it
+    if(it != key_value_container.end())
+    {
+      //we found it, return the value
+      return it->second();
+    }
+    //we didn't find it
+    else
+    {
+      throw key_not_found_exception();
+    }
+  }
+  catch(const std::exception &e)
+  {
+    //somebody else's problem...
+    throw;
+  }
 }
 
 //@todo throw meaningful exceptions, handle exceptions
 parse_cgi::key_value_data::value_type parse::cgi::key_value_data::pop_value(const parse_cgi::key_value_data::key_type &key)
 {
+  try
+  {
+    //the value we will return
+    key_value_container::iterator it = this->key_value_container.find(key);
 
+    //if key_value_container.end() is returned, we didn't find it
+    if(it != key_value_container.end())
+    {
+      //we found it, save it
+      value_type = it->second;
+
+      //kill it
+      this->key_value_container.erase(it);
+
+      //return what we found
+      return ret;
+    }
+    else
+    {
+      throw key_not_found_exception();
+    }
+  }
+  catch(const std::exception &e)
+  {
+    throw;
+  }
 }
 
 //@todo throw meaningful exceptions, handle exceptions
@@ -258,17 +299,17 @@ std::string parse_cgi::get_url_encoded_string()
     std::string request_method = get_environment_variable("REQUEST_METHOD");
 
     //was the data sent to us via GET?
-    if(request_method.compare("GET") == 0)
+    if(request_method == "GET")
     {
       return get_url_encoded_string_via_get();
     }
     //was the data sent to us via POST?
-    else if(request_method.compare("POST") == 0)
+    else if(request_method == "POST")
     {
       return get_url_encoded_string_via_post();
     }
     //in case we decided to support HEAD
-    else if(request_method.compare("HEAD") == 0)
+    else if(request_method == "HEAD")
     {
       return get_url_encoded_string_via_head();
     }
@@ -363,7 +404,12 @@ std::string parse_cgi::get_environment_variable(const std::string &env)
   }
 }
 
-const char* parse_cgi::cgi_benign::what() const noexcept
+const char* parse_cgi::benign_exception::what() const noexcept
 {
   return "nothing wrong here";
+}
+
+const char* parse_cgi::key_value:data::key_not_found_exception::what() const noexcept
+{
+  return "the key was not found";
 }
