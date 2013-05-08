@@ -8,7 +8,7 @@ rm -fv /cgi/mime.cgi &&
 #we want the sexy c++ standard
 #we want to statically link the standard library
 #we want to print all the errors
-clang++ -Wall -Wextra -Werror -std=c++11 -static-libstdc++ -ferror-limit=0 mime.cpp parse_cgi.cpp &> cgi_build_log.txt &&
+clang++ -Wall -Wextra -Werror -std=c++11 -static-libstdc++ -ferror-limit=0 mime.cpp parse_cgi.cpp -o mime.cgi &> cgi_build_log.txt &&
 
 #got the libraries from ldd
 #clang++ -Wall -Wextra -Werror -std=c++11 -ferror-limit=0 -l libstdc++.so.6 -l libm.so.6 -l libgcc_s.so.1 -l libc.so.6 mime.o parse_cgi.o -o mime.cgi &&
