@@ -4,7 +4,7 @@
 #include <utility> //for std::pair
 
 //@brief outputs what we need for valid http
-void http_output(std::string output)
+void html_output(std::string output)
 {
   //we need to print this first
   std::cout << "Content-type: text/html" << std::endl
@@ -34,17 +34,21 @@ int main()
     //grab all our key-value pairs and store them
     parse_cgi::key_value_data key_value_pairs(parse_cgi::get_url_encoded_string());
 
-    //print out what we got
-    std::cout << "key=value" << std::endl
-              << "---------" << std::endl;
+    //build a string of what we have
+    std::string output("key=value");
+    
+    output = std::string("\n") + std::string("---------") + std::string("\n");
     for(auto p : key_value_pairs)
     {
-      std::cout << p.first << "|" << p.second << std::endl;
+      output + p.first + std::string("|") + p.second + std::string("\0");
     }
+
+    //print out the string as valid html
+    html_output(output);
   }
   catch(const std::exception &e)
   {
-    http_output(typeid(e).name() + std::string("\n") + e.what());
+    html_output(typeid(e).name() + std::string("\n") + e.what());
 
     //we don't discriminate errors...
     return 0;
