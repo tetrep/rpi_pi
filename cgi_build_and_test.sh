@@ -11,7 +11,7 @@ rm -fv /cgi/mime.cgi &&
 clang++ -Wall -Wextra -Werror -std=c++11 -ferror-limit=0 -c mime.cpp parse_cgi.cpp &> cgi_build_log.txt &&
 
 #got the libraries from ldd
-#clang++ -Wall -Wextra -Werror -std=c++11 -ferror-limit=0 -l libstdc++.so.6 -l libm.so.6 -l libgcc_s.so.1 -l libc.so.6 mime.o parse_cgi.o -o mime.cgi &&
+clang++ -Wall -Wextra -Werror -std=c++11 -ferror-limit=0 -l libstdc++.so.6 -l -l libgcc_s.so.1 -l libc.so.6 mime.o parse_cgi.o -o mime.cgi &&
 
 #copy our binary to the cgi directory
 #cp /cgi/rpi_pi/mime.cgi /cgi/ &&
