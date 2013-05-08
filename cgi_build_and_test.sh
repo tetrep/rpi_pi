@@ -8,10 +8,10 @@ rm -fv /cgi/mime.cgi &&
 #we want the sexy c++ standard
 #we want to print all the errors
 #we want to write everything to a log file
-clang ++ -Wall -Wextra -Werror -std=c++11 -ferror-limit=0 mime.cpp parse_cgi_main.cpp -o mime.cgi &> cgi_build_log.txt &&
+clang++ -Wall -Wextra -Werror -std=c++11 -ferror-limit=0 mime.cpp parse_cgi.cpp -o mime.cgi &> cgi_build_log.txt &&
 
 #copy our binary to the cgi directory
-cp /cgi/rpi_pi/mime.cgi /cgi/mime.cgi &&
+#cp /cgi/rpi_pi/mime.cgi /cgi/ &&
 
 #REQUEST_METHOD tells us how we got the data, it will be GET, POST, or HEAD
 #we will only be handling GET and POST requests

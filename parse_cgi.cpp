@@ -218,18 +218,18 @@ parse_cgi::key_value_data::key_value_container_type::iterator parse_cgi::key_val
 }
 
 //@todo throw meaningful exceptions, handle exceptions
-parse_cgi::key_value_data::value_type parse::cgi::key_value_data::get_value(const parse_cgi::key_value_data::key_type &key)
+parse_cgi::key_value_data::value_type parse_cgi::key_value_data::get_value(const parse_cgi::key_value_data::key_type &key)
 {
   try
   {
     //the iterator to the key-value pair we are looking for
-    key_value_container::const_iterator it = this->key_value_container.find(key);
+    key_value_container_type::const_iterator it = this->key_value_container.find(key);
 
     //if key_value_container.end() is returned, we didn't find it
     if(it != key_value_container.end())
     {
       //we found it, return the value
-      return it->second();
+      return it->second;
     }
     //we didn't find it
     else
@@ -245,18 +245,18 @@ parse_cgi::key_value_data::value_type parse::cgi::key_value_data::get_value(cons
 }
 
 //@todo throw meaningful exceptions, handle exceptions
-parse_cgi::key_value_data::value_type parse::cgi::key_value_data::pop_value(const parse_cgi::key_value_data::key_type &key)
+parse_cgi::key_value_data::value_type parse_cgi::key_value_data::pop_value(const parse_cgi::key_value_data::key_type &key)
 {
   try
   {
     //the value we will return
-    key_value_container::iterator it = this->key_value_container.find(key);
+    key_value_container_type::iterator it = this->key_value_container.find(key);
 
     //if key_value_container.end() is returned, we didn't find it
     if(it != key_value_container.end())
     {
       //we found it, save it
-      value_type = it->second;
+      value_type ret = it->second;
 
       //kill it
       this->key_value_container.erase(it);
@@ -409,7 +409,7 @@ const char* parse_cgi::benign_exception::what() const noexcept
   return "nothing wrong here";
 }
 
-const char* parse_cgi::key_value:data::key_not_found_exception::what() const noexcept
+const char* parse_cgi::key_value_data::key_not_found_exception::what() const noexcept
 {
   return "the key was not found";
 }
