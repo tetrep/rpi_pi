@@ -6,10 +6,9 @@ rm -fv /cgi/mime.cgi &&
 #we want extra warnings
 #we want warnings to be errors
 #we want the sexy c++ standard
-#static link the sexy standard library
 #we want to print all the errors
-clang++ -Wall -Wextra -Werror -std=c++11 -static-libstdc++ -static-libgcc -ferror-limit=0 mime.cpp parse_cgi.cpp -o mime.cgi &> cgi_build_log.txt &&
-#g++ -Wall -Wextra -Werror -std=c++11 -static-libstdc++ -static-libgcc mime.cpp parse_cgi.cpp -o mime.cgi &> cgi_build_log.txt &&
+clang++ -Wall -Wextra -Werror -std=c++11 -ferror-limit=0 mime.cpp parse_cgi.cpp -o mime.cgi &> cgi_build_log.txt &&
+#g++ -Wall -Wextra -Werror -std=c++11 mime.cpp parse_cgi.cpp -o mime.cgi &> cgi_build_log.txt &&
 
 #REQUEST_METHOD tells us how we got the data, it will be GET, POST, or HEAD
 #we will only be handling GET and POST requests

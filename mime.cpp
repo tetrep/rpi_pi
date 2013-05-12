@@ -7,7 +7,8 @@
 void html_output(std::string output)
 {
   //we need to print this first
-  std::cout << "Content-type: text/html" << std::endl
+  std::cout << "<!doctype html>" << std::endl
+            << "Content-type: text/html" << std::endl
             //it's html!
             << "<html>" << std::endl
               //our title
@@ -37,10 +38,10 @@ int main()
     //build a string of what we have
     std::string output("key=value");
     
-    output = std::string("\n") + std::string("---------") + std::string("\n");
+    output += std::string("\n") + std::string("---------") + std::string("\n");
     for(auto p : key_value_pairs)
     {
-      output + p.first + std::string("|") + p.second + std::string("\0");
+      output += p.first + std::string("|") + p.second + std::string("\n");
     }
 
     //print out the string as valid html
