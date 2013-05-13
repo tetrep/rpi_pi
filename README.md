@@ -11,3 +11,11 @@ todo:
 =print out html
   -probably want to use a class for this so i can easily pass around strings with html tags
 =kerberos authentication (frontend)
+
+api:
+-----
+action
+userid
+ticket
+printer
+file
