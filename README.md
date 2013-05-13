@@ -7,6 +7,7 @@ decided to break my c89(ish) prison for the cgi, i'll be using c++ sparingly to 
 
 todo:
 -------
-minor refactoring to clean up some functions
-print out html
-kerberos authentication (frontend)
+=minor refactoring to clean up some functions
+=print out html
+  -probably want to use a class for this so i can easily pass around strings with html tags
+=kerberos authentication (frontend)
