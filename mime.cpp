@@ -8,19 +8,18 @@ void html_output(std::string output)
 {
   //we need to print this first
   std::cout << "<!doctype html>" << std::endl
-            << "Content-type: text/html" << std::endl
             //it's html!
             << "<html>" << std::endl
               //our title
               << "<title>TEST PAGE</title>" << std::endl
               //start of the body
               << "<body>" << std::endl
-                //don't format our given output
-                << "<code>" << std::endl
+                //format our given output
+                << "<p>" << std::endl
                   //actually print what we were given
                   << output << std::endl
-                //close the code tag
-                << "</code>"
+                //close the tag
+                << "</p>"
               //close the body tag
               << "</body>" << std::endl
             //close the html tag
@@ -49,7 +48,7 @@ int main()
   }
   catch(const std::exception &e)
   {
-    html_output(typeid(e).name() + std::string("\n") + e.what());
+    html_output(typeid(e).name() + std::string("\n") + e.what() + std::string("\n"));
 
     //we don't discriminate errors...
     return 0;
